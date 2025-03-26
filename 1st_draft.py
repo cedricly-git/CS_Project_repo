@@ -1,8 +1,8 @@
 import requests
 
-API_KEY = "api_key"
+API_KEY = "BjJAbPigzeN2PU1bmHvVWfbBcJBpcakBMNCKBiq9lIFfxO0So3"
 CITY = "St. Gallen"
-url = f"http://api.openweathermap.org/data/2.5/weather?q={CITY}&appid={API_KEY}&units=metric"
+url = f"https://plant.id/api/v3"
 
 response = requests.get(url)
 data = response.json()
