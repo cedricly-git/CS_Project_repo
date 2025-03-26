@@ -1,6 +1,6 @@
 import requests
 
-API_KEY = "BjJAbPigzeN2PU1bmHvVWfbBcJBpcakBMNCKBiq9lIFfxO0So3"
+API_KEY = ""
 CITY = "St. Gallen"
 url = f"https://plant.id/api/v3"
 
