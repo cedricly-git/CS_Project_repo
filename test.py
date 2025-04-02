@@ -10,4 +10,5 @@ st.write("Hooray, we connected everything")
 
 st.write("It works!")
 
-test if works
+st.print('test if works')
+
