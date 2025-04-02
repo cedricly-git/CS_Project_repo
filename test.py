@@ -15,3 +15,10 @@ print("new code")
 print("BonApettitJohann")
 
 y = hi
+<<<<<<< HEAD
+
+print("KUSO")
+
+=======
+
+>>>>>>> 27429a52141a2456933710275564b71a2097afbd
