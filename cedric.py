@@ -2,7 +2,7 @@ import requests
 import pandas as pd
 
 API_KEY = "1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms"
-url = "https://api.example.com/data"
+url = "https://trefle.io/api/v1/"
 response = requests.get(url)
 
 if response.status_code == 200:
