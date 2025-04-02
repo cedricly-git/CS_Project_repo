@@ -10,6 +10,8 @@ st.write("Hooray, we connected everything")
 
 print('salut')
 
+print("new code")
+
 print("BonApettitJohann")
 
 y = hi
