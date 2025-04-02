@@ -7,9 +7,3 @@ x = 7
 import streamlit as st
 
 st.write("Hooray, we connected everything")
-
-print('salut')
-
-print("new code")
-
-print("BonApettitJohann")
