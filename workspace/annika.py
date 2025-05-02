@@ -19,18 +19,23 @@ reponse = request.get(base_url, params=params)
 
 # check is response was successful (status code 200)
 if response.status_code == 200:
-# conversion into Python dictionary
-data = resonse.json()
+  # conversion into Python dictionary
+  data = resonse.json()
 
-weather = {
-  'city': data['name'],
-  'temperature': data['main', 'temp'],
-  'description': data['weather'][0]['description'],
-  'humidity': data['main', 'humnidity']
-}
+  weather = {
+    'city': data['name'],
+    'temperature': data['main', 'temp'],
+    'description': data['weather'][0]['description'],
+    'humidity': data['main', 'humnidity']
+  }
 
-# extract useful information from repsonse 
-return weather
+  # extract useful information from repsonse 
+  return weather
+  # error message
+else: 
+  print("Error:", response.status_code)
+  return none
+
 
 
   
