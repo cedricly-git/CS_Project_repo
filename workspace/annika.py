@@ -1,3 +1,5 @@
+pip install requests
+
 # weather API
 import requests
 
