@@ -1,0 +1,1 @@
+https://api.meteomatics.com/2025-04-29T00:00:00Z/t_2m:C/52.520551,13.461804/html
