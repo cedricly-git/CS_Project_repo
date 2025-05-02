@@ -46,3 +46,4 @@ if "suggestions" in response_data and response_data["suggestions"]:
     print(f"Confidence: {round(probability * 100, 2)}%")
 else:
     print("No plant suggestions found.")
+
