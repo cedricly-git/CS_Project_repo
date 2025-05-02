@@ -12,7 +12,7 @@ def get_weather(city, api_key):
     'q': city,             # q is city name one wants data for
     'appid': api_key,      # personal API key
     'units': 'metric'      # For temperature units in celcius
-}
+  }
 
 # sends GET request to weather API with parameters
 reponse = request.get(base_url, params=params)
@@ -24,4 +24,13 @@ data = resonse.json()
 
 weather = {
   'city': data['name'],
-  'temperature': data['main', 'temp']
+  'temperature': data['main', 'temp'],
+  'description': data['weather'][0]['description'],
+  'humidity': data['main', 'humnidity']
+}
+
+# extract useful information from repsonse 
+return weather
+
+
+  
