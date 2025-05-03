@@ -1,3 +1,7 @@
+API_KEY = 
+API_URL =
+
+
 # Required for compatibility with Python
 from __future__ import print_function
 
