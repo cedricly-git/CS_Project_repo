@@ -5,7 +5,7 @@ import requests
 
 # API keys inserted
 API_key
-API_URL
+API_URL = https://api.meteomatics.com/2025-04-29T00:00:00Z/t_2m:C/52.520551,13.461804/html
 
 # function to get weather data for given city 
 def get_weather(city, api_key): 
