@@ -16,21 +16,31 @@ This Streamlit app helps users track plant watering needs by combining image-bas
 
 The project is organized into a folder structure that separates concerns and makes the codebase maintainable:
 1. app
-   1.1 app.py
-   1.2 calendar_api.py
-   1.3 plant_api.py
-   1.4 weather_api.py
-3. model
-   3.1 plant classifier
-4. workspace
-   4.1 old stuff
-5. README.MD
-6. requirements.txt
 
-1. app/app.py: The main Streamlit app, orchestrating the UI. It handles user inputs (image upload, week navigation), calls the classifier and weather modules, and displays results (rain chart and calendar with reminders).
-2. app/calendar_api.py: Contains logic to determine watering advice for each day of the week given the plant type and rainfall. It encodes the rules for each plant category (as given in the project specs) to output “Water” or “No water needed” recommendations per day. This keeps scheduling logic separate from data retrieval.
-3. app/plant_api.py: Handles machine learning aspects. This module would load the pre-trained plant classification model and provide a function to predict the plant type from an image. (In this framework, a placeholder function is used, and integration hooks are clearly marked for adding the real model.)
-4. app/weather_api.py: Deals with fetching weather data from Meteomatics. It contains a function to retrieve a week’s daily precipitation (in mm) for a given location via the Meteomatics API (using basic auth and/or token). API credentials and endpoints are configured here (with placeholders for secure info).
+   -> app.py
+   
+   -> calendar_api.py
+   
+   -> plant_api.py
+   
+   ->weather_api.py
+   
+3. model
+   
+   -> plant classifier
+   
+5. workspace
+   
+   -> old stuff
+   
+7. README.MD
+   
+9. requirements.txt
+
+- app/app.py: The main Streamlit app, orchestrating the UI. It handles user inputs (image upload, week navigation), calls the classifier and weather modules, and displays results (rain chart and calendar with reminders).
+- app/calendar_api.py: Contains logic to determine watering advice for each day of the week given the plant type and rainfall. It encodes the rules for each plant category (as given in the project specs) to output “Water” or “No water needed” recommendations per day. This keeps scheduling logic separate from data retrieval.
+- app/plant_api.py: Handles machine learning aspects. This module would load the pre-trained plant classification model and provide a function to predict the plant type from an image. (In this framework, a placeholder function is used, and integration hooks are clearly marked for adding the real model.)
+- app/weather_api.py: Deals with fetching weather data from Meteomatics. It contains a function to retrieve a week’s daily precipitation (in mm) for a given location via the Meteomatics API (using basic auth and/or token). API credentials and endpoints are configured here (with placeholders for secure info).
 
 Each Python file is well-commented to explain its purpose and the steps of the computation, making it easy for others to understand and contribute. Below, we provide code snippets for these components which can be copied directly into VS Code and run with Streamlit.
 
