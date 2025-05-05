@@ -49,68 +49,68 @@ if st.session_state.plant_info:
     # --- Char Title ---
     st.subheader("Daily Rainfall (mm)")
     # — Chart + Navigation in one row —
-left, center, right = st.columns([1, 6, 1])
+    left, center, right = st.columns([1, 6, 1])
 
-with left:
-    if st.button("← Previous Week"):
-        st.session_state.week_start -= datetime.timedelta(days=7)
+    with left:
+        if st.button("← Previous Week"):
+            st.session_state.week_start -= datetime.timedelta(days=7)
 
-with right:
-    if st.button("Next Week →"):
-        st.session_state.week_start += datetime.timedelta(days=7)
+    with right:
+        if st.button("Next Week →"):
+            st.session_state.week_start += datetime.timedelta(days=7)
 
-with center:
-    # Title for the chart
-    st.subheader("Daily Rainfall (mm)")
-    # Your bar chart goes here
-    st.bar_chart(df_rain["Rain (mm)"], height=200)
+    with center:
+        # Title for the chart
+        st.subheader("Daily Rainfall (mm)")
+        # Your bar chart goes here
+        st.bar_chart(df_rain["Rain (mm)"], height=200)
 
-    # --- Retrieve Weather Data (Rainfall) ---
-    week_start_date = st.session_state.week_start
-    # Call Meteomatics API (via our weather_api module) to get daily rainfall for the week
-    try:
-        daily_rain = get_weekly_rainfall(week_start_date)
-    except Exception as e:
-        st.error(f"Error fetching weather data: {e}")
-        daily_rain = [0]*7  # fallback to zeros to allow app to continue
+        # --- Retrieve Weather Data (Rainfall) ---
+        week_start_date = st.session_state.week_start
+        # Call Meteomatics API (via our weather_api module) to get daily rainfall for the week
+        try:
+            daily_rain = get_weekly_rainfall(week_start_date)
+        except Exception as e:
+            st.error(f"Error fetching weather data: {e}")
+            daily_rain = [0]*7  # fallback to zeros to allow app to continue
 
-    # --- Determine Watering Advice ---
-    # Compute watering recommendation for each day, based on plant type and rainfall
-    watering_schedule = get_watering_advice(plant_type, daily_rain)
+        # --- Determine Watering Advice ---
+        # Compute watering recommendation for each day, based on plant type and rainfall
+        watering_schedule = get_watering_advice(plant_type, daily_rain)
 
-    # --- Display Results: Rainfall Chart and Table ---
-    # 1. Bar chart for daily rainfall, preserving chronological order
-    #  ────────────────────────────────────────────────────────────────
-    # Build the date labels in order
-    dates = [
-        (week_start_date + datetime.timedelta(days=i)).strftime("%a %d %b")
-        for i in range(7)
-    ]
-    df_rain = pd.DataFrame({
-        "Date": dates,
-        "Rain (mm)": daily_rain
-    })
-    # Tell pandas that Date is an ordered categorical axis
-    df_rain["Date"] = pd.Categorical(df_rain["Date"],
-                                     categories=dates,
-                                     ordered=True)
-    df_rain = df_rain.set_index("Date")
-   
+        # --- Display Results: Rainfall Chart and Table ---
+        # 1. Bar chart for daily rainfall, preserving chronological order
+        #  ────────────────────────────────────────────────────────────────
+        # Build the date labels in order
+        dates = [
+            (week_start_date + datetime.timedelta(days=i)).strftime("%a %d %b")
+            for i in range(7)
+        ]
+        df_rain = pd.DataFrame({
+            "Date": dates,
+            "Rain (mm)": daily_rain
+        })
+        # Tell pandas that Date is an ordered categorical axis
+        df_rain["Date"] = pd.Categorical(df_rain["Date"],
+                                        categories=dates,
+                                        ordered=True)
+        df_rain = df_rain.set_index("Date")
+    
 
-    # 2. Weekly calendar table with rainfall and watering recommendation
-    st.subheader("Weekly Watering Schedule")
-    calendar_data = {
-        "Day": [(week_start_date + datetime.timedelta(days=i)).strftime("%A") for i in range(7)],
-        "Date": [(week_start_date + datetime.timedelta(days=i)).strftime("%d %b %Y") for i in range(7)],
-        "Rain (mm)": daily_rain,
-        "Watering Advice": watering_schedule
-    }
-    calendar_df = pd.DataFrame(calendar_data)
-    # Use a static table for clarity
-    st.table(calendar_df)
+        # 2. Weekly calendar table with rainfall and watering recommendation
+        st.subheader("Weekly Watering Schedule")
+        calendar_data = {
+            "Day": [(week_start_date + datetime.timedelta(days=i)).strftime("%A") for i in range(7)],
+            "Date": [(week_start_date + datetime.timedelta(days=i)).strftime("%d %b %Y") for i in range(7)],
+            "Rain (mm)": daily_rain,
+            "Watering Advice": watering_schedule
+        }
+        calendar_df = pd.DataFrame(calendar_data)
+        # Use a static table for clarity
+        st.table(calendar_df)
 
-    # Optional: additional note or legend for watering advice
-    st.write("**Note:** 'Watering Advice' is based on plant type rules and recent rain. "
-             "For example, a recommendation of 'Water' means no significant rain recently and your plant likely needs watering.")
+        # Optional: additional note or legend for watering advice
+        st.write("**Note:** 'Watering Advice' is based on plant type rules and recent rain. "
+                "For example, a recommendation of 'Water' means no significant rain recently and your plant likely needs watering.")
 else:
     st.info("📷 Please upload a plant image and click 'Identify Plant' to see the watering schedule.")
