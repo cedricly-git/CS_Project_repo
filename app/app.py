@@ -46,21 +46,24 @@ if st.session_state.plant_info:
     plant_name = st.session_state.plant_info["name"]
     plant_type = st.session_state.plant_info["type"]
 
-    # --- Week Navigation Controls ---
-    st.subheader("Weekly Watering Schedule")
-    # Navigation buttons for previous/next week
-    col1, col2, col3 = st.columns([1,1,3])
-    with col1:
-        if st.button("← Previous Week"):
-            st.session_state.week_start -= datetime.timedelta(days=7)
-    with col2:
-        if st.button("Next Week →"):
-            st.session_state.week_start += datetime.timedelta(days=7)
-    with col3:
-        # Display current week range in the third column
-        wk_start = st.session_state.week_start
-        wk_end = wk_start + datetime.timedelta(days=6)
-        st.markdown(f"**Week of {wk_start.strftime('%d %b %Y')}**")  # e.g., "Week of 05 May 2025"
+    # --- Char Title ---
+    st.subheader("Daily Rainfall (mm)")
+    # — Chart + Navigation in one row —
+left, center, right = st.columns([1, 6, 1])
+
+with left:
+    if st.button("← Previous Week"):
+        st.session_state.week_start -= datetime.timedelta(days=7)
+
+with right:
+    if st.button("Next Week →"):
+        st.session_state.week_start += datetime.timedelta(days=7)
+
+with center:
+    # Title for the chart
+    st.subheader("Daily Rainfall (mm)")
+    # Your bar chart goes here
+    st.bar_chart(df_rain["Rain (mm)"], height=200)
 
     # --- Retrieve Weather Data (Rainfall) ---
     week_start_date = st.session_state.week_start
@@ -76,16 +79,26 @@ if st.session_state.plant_info:
     watering_schedule = get_watering_advice(plant_type, daily_rain)
 
     # --- Display Results: Rainfall Chart and Table ---
-    # 1. Bar chart for daily rainfall
+    # 1. Bar chart for daily rainfall, preserving chronological order
+    #  ────────────────────────────────────────────────────────────────
+    # Build the date labels in order
+    dates = [
+        (week_start_date + datetime.timedelta(days=i)).strftime("%a %d %b")
+        for i in range(7)
+    ]
     df_rain = pd.DataFrame({
-        "Date": [(week_start_date + datetime.timedelta(days=i)).strftime("%a %d %b") for i in range(7)],
+        "Date": dates,
         "Rain (mm)": daily_rain
     })
-    df_rain.set_index("Date", inplace=True)
-    st.bar_chart(df_rain["Rain (mm)"], height=200)
-    st.caption("Daily rainfall for the selected week (mm)")
+    # Tell pandas that Date is an ordered categorical axis
+    df_rain["Date"] = pd.Categorical(df_rain["Date"],
+                                     categories=dates,
+                                     ordered=True)
+    df_rain = df_rain.set_index("Date")
+   
 
     # 2. Weekly calendar table with rainfall and watering recommendation
+    st.subheader("Weekly Watering Schedule")
     calendar_data = {
         "Day": [(week_start_date + datetime.timedelta(days=i)).strftime("%A") for i in range(7)],
         "Date": [(week_start_date + datetime.timedelta(days=i)).strftime("%d %b %Y") for i in range(7)],
