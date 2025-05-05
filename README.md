@@ -1,4 +1,4 @@
-**Plant Watering Assistant Streamlit App – Project Framework**
+**Plantelligence – Project Framework**
 
 **Project Overview**
 
