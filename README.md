@@ -6,10 +6,15 @@ This Streamlit app helps users track plant watering needs by combining image-bas
 
 **Key Features:**
 	•	Machine Learning Inference: Classify an uploaded plant image into one of six categories (Cacti/Succulents, Grasses/Lawns, Flowering Plants, Fruiting Plants, Trees/Shrubs, Ferns/Mosses) using a pre-trained model (placeholder integration).
+ 
  	•	Weather Data via API: Retrieve daily rainfall data (mm) for the selected location using the Meteomatics Weather API (free tier). This uses API calls with basic authentication to get JSON weather data.
+  
   	•	Intuitive Week-View Calendar: Display a 7-day calendar (with navigation for previous/next weeks) showing each day’s rainfall and whether watering is recommended for the plant. Watering reminders follow rules for each plant type and consider the last significant rain event (e.g. a “significant rain” is defined as >10 mm in a day ￼).
+   
    	•	Data Visualization: Include a simple bar chart of the week’s daily rainfall for a quick visual overview.
+    
     	•	User Interaction: Interactive file upload for images and week navigation buttons. All state (plant info, current week) is stored in the Streamlit session (no database or login). Data resets on refresh.
+     
      	•	Collaborative Codebase: The code is organized into clear modules with descriptive comments, making it easy for a team to collaborate. Each component (classification, weather API, scheduling logic, UI) is separated for clarity.
 
 **Project Structure**
