@@ -23,7 +23,7 @@ The project is organized into a folder structure that separates concerns and mak
    
    -> plant_api.py
    
-   ->weather_api.py
+   -> weather_api.py
    
 3. model
    
