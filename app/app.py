@@ -59,24 +59,33 @@ if st.session_state.garden:
             with cols[j]:
                 st.image(plant["image_bytes"], width=150, caption=f"{plant['name']} - {plant['type']}")
     # Fetch weekly rainfall data (once) for the garden's location (if applicable)
-    if 'weekly_rain' not in st.session_state:
-        st.session_state.weekly_rain = get_weekly_rainfall()
-    weekly_rain = st.session_state.weekly_rain
+    # … after you've unpacked plant_info …  
+week_start = st.session_state.week_start
 
-    # Display the weekly rainfall chart
-    st.subheader("Weekly Rainfall Forecast")
-    # Get watering schedule (which also computes day labels and uses rainfall data)
-    schedule_df = get_watering_schedule(st.session_state.garden, weekly_rain)
-    # Prepare data for chart (avoid special characters in column names for Altair)
-    chart_df = schedule_df[["Day", "Rain (mm)"]].copy()
-    chart_df.rename(columns={"Rain (mm)": "Rain_mm"}, inplace=True)
-    days_order = chart_df["Day"].tolist()
-    chart = alt.Chart(chart_df).mark_bar().encode(
-        x=alt.X('Day:N', sort=days_order, title='Day'),
-        y=alt.Y('Rain_mm:Q', title='Rain (mm)')
+# 1) Fetch or refresh rainfall data for that week
+if 'weekly_rain' not in st.session_state or st.session_state.week_start != week_start:
+    try:
+        st.session_state.weekly_rain = get_weekly_rainfall(week_start)
+    except Exception as e:
+        st.error(f"Error fetching weather data: {e}")
+        st.session_state.weekly_rain = [0.0] * 7
+
+weekly_rain = st.session_state.weekly_rain
+
+# Display the weekly rainfall chart
+st.subheader("Weekly Rainfall Forecast")
+# Get watering schedule (which also computes day labels and uses rainfall data)
+schedule_df = get_watering_schedule(st.session_state.garden, weekly_rain)
+# Prepare data for chart (avoid special characters in column names for Altair)
+chart_df = schedule_df[["Day", "Rain (mm)"]].copy()
+chart_df.rename(columns={"Rain (mm)": "Rain_mm"}, inplace=True)
+days_order = chart_df["Day"].tolist()
+chart = alt.Chart(chart_df).mark_bar().encode(
+    x=alt.X('Day:N', sort=days_order, title='Day'),
+    y=alt.Y('Rain_mm:Q', title='Rain (mm)')
     )
-    st.altair_chart(chart, use_container_width=True)
+st.altair_chart(chart, use_container_width=True)
 
-    # Display the consolidated watering advice table
-    st.subheader("Weekly Watering Schedule")
-    st.table(schedule_df.to_dict(orient='records'))
+# Display the consolidated watering advice table
+st.subheader("Weekly Watering Schedule")
+st.table(schedule_df.to_dict(orient='records'))
