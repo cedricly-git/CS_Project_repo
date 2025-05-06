@@ -19,28 +19,38 @@ st.title("Welcome to Plantelligence")
 # Input for garden name
 garden_name = st.text_input("Name your garden:", key="garden_name")
 
-# Section to add a new plant to the garden
+# --- Image Upload & Classification Form ---
 st.subheader("Add a Plant to Your Garden")
-plant_name = st.text_input("Plant Name", key="plant_name")
-plant_image_file = st.file_uploader("Upload Plant Image", type=["jpg", "jpeg", "png"], key="plant_image")
 
-if st.button("Add Plant"):
-    if plant_name and plant_image_file:
-        # Read and classify the uploaded plant image
-        image_bytes = plant_image_file.read()
-        img = Image.open(BytesIO(image_bytes))
-        img = img.convert("RGB")  # ensure compatibility for classification
-        plant_type = classify_plant_image(img)
-        # Store the plant's info in the session state garden list
-        st.session_state.garden.append({
-            "name": plant_name,
-            "type": plant_type,
-            "image_bytes": image_bytes
-        })
-        # Clear input fields for the next entry
-        st.session_state.plant_name = ""
-        st.session_state.plant_image = None
-        st.success(f"Added {plant_name} ({plant_type}) to garden.")
+# Step A: the two inputs, each with its own key
+plant_name_input  = st.text_input("Plant Name", key="plant_name_input")
+plant_file_input  = st.file_uploader(
+    "Upload Plant Image",
+    type=["jpg", "jpeg", "png"],
+    key="plant_file_input"
+)
+
+# Step B: callback that runs when you click "Add Plant"
+def add_plant_to_garden():
+    # read and classify
+    image_bytes = st.session_state.plant_file_input.read()
+    img = Image.open(BytesIO(image_bytes)).convert("RGB")
+    plant_type = classify_plant_image(img)
+
+    # append to your garden list
+    st.session_state.garden.append({
+        "name":  st.session_state.plant_name_input,
+        "type":  plant_type,
+        "image_bytes": image_bytes
+    })
+
+    # clear the inputs for the next entry
+    st.session_state.plant_name_input = ""
+    st.session_state.plant_file_input = None
+    st.success(f"Added **{plant_type}** “{st.session_state.plant_name_input}” to your garden.")
+
+# Step C: the button wired to that callback
+st.button("Add Plant", on_click=add_plant_to_garden)
     else:
         st.warning("Please provide both a plant name and an image.")
 
