@@ -1,0 +1,72 @@
+import os
+import requests
+import time
+
+# 1) Load your token
+TREFLE_TOKEN = os.getenv("1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms")
+if not TREFLE_TOKEN:
+    raise RuntimeError("Set your TREFLE_TOKEN environment variable")
+HEADERS = {"Authorization": f"Bearer {TREFLE_TOKEN}"}
+BASE_URL = "https://trefle.io/api/v1"
+
+# 2) Map Trefle growth_habit → your categories
+habit_to_category = {
+    "Annual":                   "Flower",
+    "Biennial":                 "Flower",
+    "Herbaceous Perennial":     "Flower",
+    "Deciduous Tree":           "Tree",
+    "Evergreen Tree":           "Tree",
+    "Grass":                    "Grass",
+    "Succulent":                "Succulent",
+    "Shrub":                    "Succulent",
+    "Subshrub":                 "Succulent",
+}
+
+# 3) Prepare your target dict & counters
+TARGET = 150
+plant_types = {cat: [] for cat in ("Flower", "Tree", "Grass", "Succulent", "Edible")}
+counts = {cat: 0 for cat in plant_types}
+
+# 4) Page through species until each category hits TARGET
+page = 1
+while True:
+    resp = requests.get(
+        f"{BASE_URL}/species",
+        headers=HEADERS,
+        params={"page": page, "per_page": 100}  # max page size
+    )
+    resp.raise_for_status()
+    species_batch = resp.json().get("data", [])
+    if not species_batch:
+        break
+
+    for sp in species_batch:
+        # if we’re already done, break out
+        if all(c >= TARGET for c in counts.values()):
+            break
+
+        slug = sp["slug"]
+        habit = sp.get("growth_habit", "")
+        edible_flag = sp.get("edible") or bool(sp.get("edible_part"))
+
+        if edible_flag and counts["Edible"] < TARGET:
+            plant_types["Edible"].append(slug)
+            counts["Edible"] += 1
+
+        elif habit in habit_to_category:
+            cat = habit_to_category[habit]
+            if counts[cat] < TARGET:
+                plant_types[cat].append(slug)
+                counts[cat] += 1
+
+    # check again after the batch
+    if all(c >= TARGET for c in counts.values()):
+        print(f"Reached {TARGET} in each category; stopping early.")
+        break
+
+    page += 1
+    time.sleep(0.2)  # respect the API
+
+# 5) Summary
+for cat, cnt in counts.items():
+    print(f"{cat}: {cnt} species collected")
