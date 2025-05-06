@@ -1,68 +1,75 @@
-# calendar_api
-
-from datetime import datetime, timedelta
+# app/calendar_api.py
+from datetime import timedelta
 import pandas as pd
 
-def get_watering_schedule(garden, weekly_rain):
+SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm considered heavy rain
+
+
+def get_watering_schedule(garden: list, weekly_rain: list, week_start_date) -> pd.DataFrame:
     """
     Compute a 7-day watering schedule for a list of plants given weekly rainfall.
-    - garden: list of dicts, each with 'name' and 'type' keys for each plant.
-    - weekly_rain: iterable of 7 rainfall values (in mm) for the next 7 days.
-    Returns a pandas DataFrame with columns: Day, Date, Rain (mm), Watering Advice.
+    - garden: list of dicts, each with 'name' and 'type' for each plant.
+    - weekly_rain: iterable of 7 rainfall values (mm).
+    - week_start_date: starting date (Monday).
+    Returns a DataFrame with columns Day, Date, Rain (mm), Watering Advice.
     """
-    # If no plants provided, return an empty schedule
-    if not garden:
-        columns = ["Day", "Date", "Rain (mm)", "Watering Advice"]
-        return pd.DataFrame(columns=columns)
+    # Build base calendar
+    dates = [(week_start_date + timedelta(days=i)) for i in range(7)]
+    day_names = [d.strftime("%A") for d in dates]
+    date_strs = [d.strftime("%d %b %Y") for d in dates]
+    rain_vals = [float(r) for r in weekly_rain]
 
-    # Ensure we have exactly 7 days of rainfall data
-    try:
-        rain_list = list(weekly_rain)
-    except Exception as e:
-        raise ValueError("weekly_rain must be an iterable of length 7") from e
-    if len(rain_list) < 7:
-        # Pad with 0 mm if data is missing
-        rain_list = (rain_list + [0.0] * 7)[:7]
-    elif len(rain_list) > 7:
-        rain_list = rain_list[:7]
-    rains = [float(r) for r in rain_list]
-
-    def plant_needs_water(plant_type, rain_amount):
-        """Determine if a plant of given type needs watering given the rain amount."""
-        pt = plant_type.lower()
-        # Default threshold (mm of rain) above which watering is not needed
-        threshold = 3.0
-        # Adjust threshold based on plant type (placeholder logic per plant water needs)
-        if "cactus" in pt or "succulent" in pt:
-            threshold = 1.0   # low water requirement
-        elif "fern" in pt or "moss" in pt:
-            threshold = 5.0   # high water requirement
-        elif "orchid" in pt or "lily" in pt or "hydrangea" in pt or "ivy" in pt:
-            threshold = 4.0   # moderate-high water requirement
-        elif "rose" in pt or "herb" in pt or "flower" in pt:
-            threshold = 3.0   # moderate water requirement (default)
-        # Needs watering if rain is below the threshold
-        return rain_amount < threshold
-
-    # Build the schedule for each day
-    schedule = []
-    today = datetime.today()
-    for i, rain in enumerate(rains):
-        day_date = today + timedelta(days=i)
-        day_name = day_date.strftime("%a")       # e.g. Mon, Tue
-        date_str = day_date.strftime("%b %d")    # e.g. Jan 05
-        # Determine which plants require watering on this day
-        plants_to_water = [plant["name"] for plant in garden if plant_needs_water(plant["type"], rain)]
-        if plants_to_water:
-            advice = ", ".join(f"Water {name}" for name in plants_to_water)
+    # Prepare advice per plant per day
+    # Use existing logic for single plant; adapt for multiple
+    def plant_needs_watering(plant_type, recent_rain):
+        # import single-plant logic
+        from calendar_api import SIGNIFICANT_RAIN_THRESHOLD as THRESH
+        # Determine max dry days by type
+        if plant_type == "Cacti/Succulents":
+            max_dry = 14
+        elif plant_type == "Grasses/Lawns":
+            max_dry = 7
+        elif plant_type in ["Flowering Plants", "Fruiting Plants"]:
+            max_dry = 3
+        elif plant_type == "Trees/Shrubs":
+            max_dry = 10
+        elif plant_type == "Ferns/Mosses":
+            max_dry = 2
         else:
-            advice = "No watering needed"
-        schedule.append({
-            "Day": day_name,
-            "Date": date_str,
-            "Rain (mm)": round(rain, 1),
-            "Watering Advice": advice
-        })
+            max_dry = 7
+        # Decide watering
+        if recent_rain >= THRESH:
+            return False, 0
+        return True, max_dry
 
-    # Convert the schedule list to a DataFrame for easy display
-    return pd.DataFrame(schedule)
+    # Track days since heavy rain per plant
+    plant_counters = [0] * len(garden)
+    advice = []
+    for day_idx in range(7):
+        day_rain = rain_vals[day_idx]
+        needs = []
+        for i, plant in enumerate(garden):
+            got_heavy = (day_rain >= SIGNIFICANT_RAIN_THRESHOLD)
+            if got_heavy:
+                plant_counters[i] = 0
+            else:
+                plant_counters[i] += 1
+            # check if counter exceeds max_dry
+            plant_type = plant['type']
+            _, max_dry = plant_needs_watering(plant_type, day_rain)
+            if plant_counters[i] > max_dry:
+                needs.append(plant['name'])
+                plant_counters[i] = 0
+        if needs:
+            advice.append("Water: " + ", ".join(needs))
+        else:
+            advice.append("No water needed")
+
+    # Build DataFrame
+    df = pd.DataFrame({
+        "Day": day_names,
+        "Date": date_strs,
+        "Rain (mm)": rain_vals,
+        "Watering Advice": advice
+    })
+    return df
