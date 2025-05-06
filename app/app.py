@@ -51,8 +51,6 @@ def add_plant_to_garden():
 
 # Step C: the button wired to that callback
 st.button("Add Plant", on_click=add_plant_to_garden)
-    else:
-        st.warning("Please provide both a plant name and an image.")
 
 # If there are plants in the garden, display the overview, rainfall chart, and watering schedule
 if st.session_state.garden:
