@@ -6,7 +6,7 @@
 # open terminal into this folder:
 # cd CS_Project_repo
 
-#step 3
+#step 3 (long and not always necessary so try step 4 before)
 # install streamlit and all the libraries(Ithink) from requirements.txt
 # pip install -r requirements.txt
 
