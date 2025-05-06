@@ -1,20 +1,16 @@
 import requests
 import datetime
 
-# Configuration: Meteomatics API credentials (to be provided by user)
 METEO_USER = "universityofstgallen_soerensen_johann"   
 METEO_PASS = "iDV83e4R6e"
 
-# Define a default location for weather data (latitude, longitude)
-# Here we use St. Gallen, Switzerland as an example location
+# Define a default location (St.Gallen, Switzerland) for weather data (latitude, longitude)
 DEFAULT_LAT = 47.4245
 DEFAULT_LON = 9.3767
 
 def get_weekly_rainfall(week_start_date: datetime.date, lat: float = DEFAULT_LAT, lon: float = DEFAULT_LON) -> list:
-    """
-    Fetch daily rainfall (in mm) for 7 days starting from week_start_date (inclusive) at the given location.
-    Returns a list of 7 rainfall values (mm) for each day.
-    """
+    """Fetch daily rainfall (in mm) for 7 days starting from week_start_date (inclusive) at the given location.
+    Returns a list of 7 rainfall values (mm) for each day."""
     # Construct the Meteomatics API URL for daily precipitation (24h accumulated) 
     # from week_start_date to week_start_date+7 days (which gives 7 values, one per day).
     # Format dates to ISO 8601 with UTC time (00:00Z for daily accumulated precipitation).
