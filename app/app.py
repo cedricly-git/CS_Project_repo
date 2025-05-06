@@ -68,19 +68,24 @@ if st.session_state.plant_info:
     df_rain["Date"] = pd.Categorical(df_rain["Date"], categories=dates, ordered=True)
     df_rain = df_rain.set_index("Date")
 
-    # 3) Navigation + Chart
-    col1, col2, col3 = st.columns([1, 6, 1])
-    with col1:
+    # --- 3) Title + Navigation Buttons + Chart ---
+
+    # A) Chart title, full width
+    st.subheader("Daily Rainfall (mm)")
+
+    # B) Two‐column row for the Prev/Next buttons
+    prev_col, next_col = st.columns(2)
+    with prev_col:
         if st.button("← Previous Week"):
             st.session_state.week_start -= datetime.timedelta(days=7)
             st.experimental_rerun()
-    with col3:
+    with next_col:
         if st.button("Next Week →"):
             st.session_state.week_start += datetime.timedelta(days=7)
             st.experimental_rerun()
-    with col2:
-        st.subheader("Daily Rainfall (mm)")
-        st.bar_chart(df_rain["Rain (mm)"], height=200)
+
+    # C) Now the rainfall bar chart, full width
+    st.bar_chart(df_rain["Rain (mm)"], height=200)
 
     # 4) Watering Advice Table
     watering_schedule = get_watering_advice(plant_type, daily_rain)
