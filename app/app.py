@@ -1,101 +1,76 @@
 # app/app.py
-
 import streamlit as st
-import datetime
-import pandas as pd
-
-# Import our helper modules
-from plant_api import classify_plant_image
 from weather_api import get_weekly_rainfall
-from calendar_api import get_watering_advice
+from copy_plant_api_test import classify_plant_image
+from calendar_api import get_watering_schedule
+from PIL import Image
+from io import BytesIO
+import altair as alt
 
-# --- Config & Session State ---
-st.set_page_config(page_title="Plant Watering Assistant", layout="centered")
+# Initialize session state for garden
+if 'garden' not in st.session_state:
+    st.session_state.garden = []
 
-if 'plant_info' not in st.session_state:
-    st.session_state.plant_info = None
+st.title("Welcome to Plantelligence")
 
-if 'week_start' not in st.session_state:
-    today = datetime.date.today()
-    monday = today - datetime.timedelta(days=today.weekday())  # get this week's Monday
-    st.session_state.week_start = monday
+# Input for garden name
+garden_name = st.text_input("Name your garden:", key="garden_name")
 
-# --- Title & Instructions ---
-st.title("🌱 Plant Watering Assistant")
-st.write(
-    "Upload a plant image to classify its type, then view a weekly calendar with "
-    "rainfall data and watering reminders. (All data is session-based; no login required.)"
-)
+# Section to add a new plant to the garden
+st.subheader("Add a Plant to Your Garden")
+plant_name = st.text_input("Plant Name", key="plant_name")
+plant_image_file = st.file_uploader("Upload Plant Image", type=["jpg", "jpeg", "png"], key="plant_image")
 
-# --- Image Upload & Classification Form ---
-with st.form("plant_form"):
-    plant_name = st.text_input("Plant Nickname", help="Give your plant a name for easy reference.")
-    image_file = st.file_uploader("Upload a picture of your plant", type=["png","jpg","jpeg"])
-    submitted = st.form_submit_button("Identify Plant")
-
-if submitted:
-    if not plant_name or not image_file:
-        st.error("Please provide both a plant name and an image.")
+if st.button("Add Plant"):
+    if plant_name and plant_image_file:
+        # Read and classify the uploaded plant image
+        image_bytes = plant_image_file.read()
+        img = Image.open(BytesIO(image_bytes))
+        img = img.convert("RGB")  # ensure compatibility for classification
+        plant_type = classify_plant_image(img)
+        # Store the plant's info in the session state garden list
+        st.session_state.garden.append({
+            "name": plant_name,
+            "type": plant_type,
+            "image_bytes": image_bytes
+        })
+        # Clear input fields for the next entry
+        st.session_state.plant_name = ""
+        st.session_state.plant_image = None
+        st.success(f"Added {plant_name} ({plant_type}) to garden.")
     else:
-        plant_type = classify_plant_image(image_file)
-        st.session_state.plant_info = {"name": plant_name, "type": plant_type}
-        st.success(f"**{plant_name}** has been classified as **{plant_type}**.")
-        st.image(image_file, caption=f"{plant_name} ({plant_type})", use_column_width=True)
+        st.warning("Please provide both a plant name and an image.")
 
-# --- Main Calendar & Chart View ---
-if st.session_state.plant_info:
-    plant_name = st.session_state.plant_info["name"]
-    plant_type = st.session_state.plant_info["type"]
-    week_start = st.session_state.week_start
+# If there are plants in the garden, display the overview, rainfall chart, and watering schedule
+if st.session_state.garden:
+    # Garden overview with all plants
+    st.subheader(f"Garden Overview{': ' + garden_name if garden_name else ''}")
+    # Display all plants in a gallery (thumbnails with name and type)
+    garden = st.session_state.garden
+    for i in range(0, len(garden), 3):
+        cols = st.columns(min(3, len(garden) - i))
+        for j, plant in enumerate(garden[i:i+3]):
+            with cols[j]:
+                st.image(plant["image_bytes"], width=150, caption=f"{plant['name']} - {plant['type']}")
+    # Fetch weekly rainfall data (once) for the garden's location (if applicable)
+    if 'weekly_rain' not in st.session_state:
+        st.session_state.weekly_rain = get_weekly_rainfall()
+    weekly_rain = st.session_state.weekly_rain
 
-    # 1) Fetch rainfall data
-    try:
-        daily_rain = get_weekly_rainfall(week_start)
-    except Exception as e:
-        st.error(f"Error fetching weather data: {e}")
-        daily_rain = [0]*7
+    # Display the weekly rainfall chart
+    st.subheader("Weekly Rainfall Forecast")
+    # Get watering schedule (which also computes day labels and uses rainfall data)
+    schedule_df = get_watering_schedule(st.session_state.garden, weekly_rain)
+    # Prepare data for chart (avoid special characters in column names for Altair)
+    chart_df = schedule_df[["Day", "Rain (mm)"]].copy()
+    chart_df.rename(columns={"Rain (mm)": "Rain_mm"}, inplace=True)
+    days_order = chart_df["Day"].tolist()
+    chart = alt.Chart(chart_df).mark_bar().encode(
+        x=alt.X('Day:N', sort=days_order, title='Day'),
+        y=alt.Y('Rain_mm:Q', title='Rain (mm)')
+    )
+    st.altair_chart(chart, use_container_width=True)
 
-    # 2) Build the bar chart data (Mon→Sun)
-    dates = [
-        (week_start + datetime.timedelta(days=i)).strftime("%a %d %b")
-        for i in range(7)
-    ]
-    df_rain = pd.DataFrame({
-        "Date": dates,
-        "Rain (mm)": daily_rain
-    })
-    # Preserve the order explicitly
-    df_rain["Date"] = pd.Categorical(df_rain["Date"], categories=dates, ordered=True)
-    df_rain = df_rain.set_index("Date")
-
-     # --- 3) Title + Navigation Buttons + Chart ---
-    # Full‐width chart title
-    st.subheader("Daily Rainfall (mm)")
-
-    # Two‐column row for Previous/Next Week
-    prev_col, next_col = st.columns(2)
-    with prev_col:
-        if st.button("← Previous Week"):
-            st.session_state.week_start -= datetime.timedelta(days=7)
-    with next_col:
-        if st.button("Next Week →"):
-            st.session_state.week_start += datetime.timedelta(days=7)
-
-    # Full‐width rainfall bar chart
-    st.bar_chart(df_rain["Rain (mm)"], height=200)
-
-    # 4) Watering Advice Table
-    watering_schedule = get_watering_advice(plant_type, daily_rain)
+    # Display the consolidated watering advice table
     st.subheader("Weekly Watering Schedule")
-    calendar_data = {
-        "Day": [(week_start + datetime.timedelta(days=i)).strftime("%A") for i in range(7)],
-        "Date": [(week_start + datetime.timedelta(days=i)).strftime("%d %b %Y") for i in range(7)],
-        "Rain (mm)": daily_rain,
-        "Watering Advice": watering_schedule
-    }
-    calendar_df = pd.DataFrame(calendar_data)
-    st.table(calendar_df)
-
-else:
-    st.info("📷 Please upload a plant image and click 'Identify Plant' to see the watering schedule.")
-    
+    st.table(schedule_df.to_dict(orient='records'))
