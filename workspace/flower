@@ -1,0 +1,41 @@
+import requests
+
+API_KEY = "1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms"
+BASE_URL = "https://trefle.io/api/v1/species"
+
+# Already included flower slugs (copy your full list here)
+existing_flower_slugs = set([
+    
+    
+])
+
+new_flower_slugs = []
+page = 1
+while len(new_flower_slugs) < 100:
+    response = requests.get(BASE_URL, params={
+        "token": API_KEY,
+        "page": page,
+        "filter[family]": "Asteraceae",  # or Rosaceae, etc.
+    })
+
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        break
+
+    data = response.json().get("data", [])
+    if not data:
+        break
+
+    for plant in data:
+        slug = plant["slug"]
+        if slug not in existing_flower_slugs and slug not in new_flower_slugs:
+            new_flower_slugs.append(slug)
+            if len(new_flower_slugs) == 100:
+                break
+
+    page += 1
+
+# Output result
+print("NEW FLOWER SPECIES:")
+for slug in new_flower_slugs:
+    print(f'"{slug}",')

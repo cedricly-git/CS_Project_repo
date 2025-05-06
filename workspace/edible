@@ -1,0 +1,68 @@
+import requests
+
+API_KEY = "1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms"
+BASE_URL = "https://trefle.io/api/v1/species"
+
+# Already included flower slugs (copy your full list here)
+existing_flower_slugs = set([
+    "malus-domestica", "citrus-limon", "vitis-vinifera", "musa-paradisiaca", "fragaria-vesca",
+        "prunus-persica", "citrullus-lanatus", "pyrus-communis", "rubus-idaeus", "ficus-carica",
+        "vaccinium-corymbosum", "ribes-nigrum", "ribes-rubrum", "sambucus-nigra", "cydonia-oblonga",
+        "actinidia-deliciosa", "passiflora-edulis", "psidium-guajava", "annona-muricata", "durio-zibethinus",
+        "diospyros-kaki", "syzygium-samarangense", "carica-papaya", "mangifera-indica", "litchi-chinensis",
+        "tamarindus-indica", "monstera-deliciosa", "myrciaria-dubia", "morinda-citrifolia", "eugenia-uniflora",
+        "artocarpus-altilis", "spondias-mombin", "melicoccus-bijugatus", "carya-illinoensis", "juglans-regia",
+        "canarium-ovatum", "cornus-mas", "elaeagnus-umbellata", "hippophae-rhamnoides", "amelanchier-alnifolia",
+        "arbutus-unedo", "cercis-canadensis", "hylocereus-undatus", "olea-europaea", "zanthoxylum-piperitum",
+        "garcinia-mangostana", "citrus-paradisi", "citrus-reticulata", "citrus-sinensis", "citrus-maxima",
+        "lactuca-sativa", "daucus-carota", "solanum-tuberosum", "allium-cepa", "spinacia-oleracea",
+        "brassica-oleracea", "beta-vulgaris", "phaseolus-vulgaris", "cucumis-sativus", "solanum-lycopersicum",
+        "allium-sativum", "apium-graveolens", "asparagus-officinalis", "brassica-rapa", "capsicum-annuum",
+        "cichorium-intybus", "coriandrum-sativum", "cucurbita-pepo", "foeniculum-vulgare", "levisticum-officinale",
+        "pastinaca-sativa", "petroselinum-crispum", "pisum-sativum", "rheum-rhabarbarum", "rucola-sativa",
+        "satureja-hortensis", "scorzonera-hispanica", "sinapis-alba", "tropaeolum-majus", "valerianella-locusta",
+        "vigna-unguiculata", "zea-mays", "abobra-tenuifolia", "brassica-juncea", "brassica-napus", 
+        "carum-carvi", "cucurbita-maxima", "cucurbita-moschata", "lupinus-albus", "lycopersicon-pimpinellifolium",
+        "mentha-spicata", "ocimum-basilicum", "origanum-majorana", "portulaca-oleracea", "rosmarinus-officinalis",
+        "satureja-montana", "solanum-melongena", "thymus-vulgaris", "trigonella-foenum-graecum", "urtica-dioica", 
+        "ananas-comosus", "artemisia-dracunculus", "asimina-triloba", "beta-vulgaris", "capparis-spinosa", 
+        "carya-cordiformis", "carya-glabra", "carya-ovata", "castanea-dentata", "cicer-arietinum", "citrullus-colocynthis", 
+        "citrullus-lanatus", "cocos-nucifera", "colocasia-esculenta", "coriandrum-sativum", "cuminum-cyminum",
+        "dioscorea-alata", "glycine-max", "hordeum-vulgare", "lablab-purpureus", "lactuca-serriola", "linum-usitatissimum", 
+        "luffa-aegyptiaca", "mangifera-indica", "manihot-esculenta", "medicago-sativa", "moringa-oleifera", 
+        "ocimum-tenuiflorum", "opuntia-stricta", "oryza-sativa", "pastinaca-sativa", "perilla-frutescens",
+        "persea-americana", "petroselinum-crispum", "physalis-peruviana", "pistacia-vera", "plukenetia-volubilis", 
+        "saccharum-officinarum", "salvia-hispanica", "sesamum-indicum"
+    
+])
+
+new_flower_slugs = []
+page = 1
+while len(new_flower_slugs) < 100:
+    response = requests.get(BASE_URL, params={
+        "token": API_KEY,
+        "page": page,
+        "filter[family]": "Asteraceae",  # or Rosaceae, etc.
+    })
+
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        break
+
+    data = response.json().get("data", [])
+    if not data:
+        break
+
+    for plant in data:
+        slug = plant["slug"]
+        if slug not in existing_flower_slugs and slug not in new_flower_slugs:
+            new_flower_slugs.append(slug)
+            if len(new_flower_slugs) == 100:
+                break
+
+    page += 1
+
+# Output result
+print("NEW FLOWER SPECIES:")
+for slug in new_flower_slugs:
+    print(f'"{slug}",')

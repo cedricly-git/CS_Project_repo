@@ -1,0 +1,67 @@
+import requests
+
+API_KEY = "1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms"
+BASE_URL = "https://trefle.io/api/v1/species"
+
+# Already included flower slugs (copy your full list here)
+existing_flower_slugs = set([
+    "dactylis-glomerata", "festuca-rubra", "phleum-pratense", "lolium-perenne", "alopecurus-pratensis",
+        "poa-pratensis", "cynodon-dactylon", "agrostis-capillaris", "bromus-inermis", "elymus-repens",
+        "andropogon-gerardii", "arundinaria-gigantea", "chrysopogon-gryllus", "danthonia-spicata", 
+        "deschampsia-flexuosa", "digitaria-sanguinalis", "eragrostis-curvula", "festuca-ovina", 
+        "glyceria-maxima", "hordeum-jubatum", "koeleria-macrantha", "leymus-arenarius", 
+        "melica-nutans", "miscanthus-sinensis", "molinia-caerulea", "nassella-tenuissima", 
+        "panicum-virgatum", "pennisetum-alopecuroides", "phalaris-arundinacea", "piptochaetium-avenaceum",
+        "schizachyrium-scoparium", "sorghastrum-nutans", "sorghum-halepense", "sporobolus-heterolepis",
+        "stipa-tenacissima", "tridens-flavus", "trisetum-flavescens", "vulpia-myuros", "zea-mays",
+        "zoysia-japonica", "xerochloa-imberbis", "urochloa-decipiens", "themeda-triandra",
+        "setaria-italica", "paspalum-notatum", "oryzopsis-hymenoides", "oryza-sativa", "elymus-canadensis",
+        "bouteloua-curtipendula", "bouteloua-gracilis", "cynodon-nlemfuensis", "cymbopogon-citratus",
+        "cymbopogon-flexuosus", "echinochloa-crus-galli", "eragrostis-spectabilis", "hordeum-murinum",
+        "leersia-oryzoides", "lygeum-spartum", "melinis-repens", "microstegium-vimineum", 
+        "muhlenbergia-capillaris", "panicum-dichotomiflorum", "panicum-capillare", "paspalum-distichum",
+        "paspalum-dilatatum", "saccharum-officinarum", "schizachne-purpurascens", "sorghum-bicolor",
+        "trisetum-spicatum", "andropogon-virginicus", "aristida-purpurea", "bothriochloa-bladhii", 
+        "cynodon-transvaalensis", "distichlis-spicata", "elymus-elymoides", "hilaria-belangeri",
+        "hyparrhenia-rufa", "paspalum-urvillei", "phragmites-australis", "polypogon-monspeliensis",
+        "saccharum-spontaneum", "trichloris-crinita", "tripidium-ravennae", "agropyron-cristatum", "agrostis-gigantea", "agrostis-stolonifera", "aristida-longespica",
+        "calamagrostis-acutiflora", "calamagrostis-canadensis", "calamagrostis-epigejos", "calamagrostis-rubescens",
+        "chasmopodium-afzelii", "coix-lacryma-jobi", "dactyloctenium-aegyptium", "digitaria-ciliaris",
+        "digitaria-ischaemum", "echinochloa-colona", "elymus-caninus", "elymus-dahuricus", "elymus-hispidus",
+        "elymus-multisetus", "elymus-villosus", "eragrostis-barrelieri", "eragrostis-brownii", "eragrostis-hirta",
+        "eragrostis-intermedia", "eragrostis-lehmanniana", "eragrostis-pilosa", "eragrostis-plana", "eragrostis-tef",
+        "festuca-arundinacea", "festuca-idahoensis", "glyceria-striata", "koeleria-glauca", "leymus-triticoides",
+        "lolium-temulentum", "nassella-pulchra", "panicum-antidotale", "panicum-coloratum"
+    
+])
+
+new_flower_slugs = []
+page = 1
+while len(new_flower_slugs) < 100:
+    response = requests.get(BASE_URL, params={
+        "token": API_KEY,
+        "page": page,
+        "filter[family]": "Asteraceae",  # or Rosaceae, etc.
+    })
+
+    if response.status_code != 200:
+        print(f"Error: {response.status_code}")
+        break
+
+    data = response.json().get("data", [])
+    if not data:
+        break
+
+    for plant in data:
+        slug = plant["slug"]
+        if slug not in existing_flower_slugs and slug not in new_flower_slugs:
+            new_flower_slugs.append(slug)
+            if len(new_flower_slugs) == 100:
+                break
+
+    page += 1
+
+# Output result
+print("NEW FLOWER SPECIES:")
+for slug in new_flower_slugs:
+    print(f'"{slug}",')

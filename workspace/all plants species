@@ -1,0 +1,52 @@
+import requests
+import csv
+import time
+import os
+
+# === CONFIG ===
+API_KEY = "1AhbgX6f-AVV6SPFX7-1q9v0HJ55kghAcuz3XE_4cms"
+BASE_URL = "https://trefle.io/api/v1/species"
+SAVE_PATH = "/Users/graceyan/Downloads/St.Gallen/All_Species.csv"
+MAX_PAGES = 100   # Adjust this if you want more or fewer pages
+
+def fetch_all_species(max_pages=MAX_PAGES):
+    all_species = []
+    for page in range(1, max_pages + 1):
+        print(f"[INFO] Fetching page {page}...")
+        url = f"{BASE_URL}?token={API_KEY}&page={page}"
+        response = requests.get(url)
+
+        if response.status_code != 200:
+            print(f"[ERROR] Page {page} failed: status {response.status_code}")
+            break
+
+        data = response.json().get("data", [])
+        if not data:
+            print("[INFO] No more data.")
+            break
+
+        for plant in data:
+            all_species.append({
+                "common_name": plant.get("common_name", ""),
+                "scientific_name": plant.get("scientific_name", ""),
+                "slug": plant.get("slug", "")
+            })
+
+        time.sleep(1)  # Respect API rate limits
+
+    return all_species
+
+def save_to_csv(species_list, path):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, mode="w", newline="", encoding="utf-8") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=["common_name", "scientific_name", "slug"])
+        writer.writeheader()
+        writer.writerows(species_list)
+    print(f"[✓] Saved {len(species_list)} species to: {path}")
+
+def main():
+    species = fetch_all_species()
+    save_to_csv(species, SAVE_PATH)
+
+if __name__ == "__main__":
+    main()
