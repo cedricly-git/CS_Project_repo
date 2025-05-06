@@ -13,6 +13,11 @@ import altair as alt
 # Initialize session state for garden
 if 'garden' not in st.session_state:
     st.session_state.garden = []
+if 'week_start' not in st.session_state:
+    import datetime
+    today  = datetime.date.today()
+    monday = today - datetime.timedelta(days=today.weekday())
+    st.session_state.week_start = monday
 
 st.title("Welcome to Plantelligence")
 
