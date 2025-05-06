@@ -1,7 +1,10 @@
 # app/app.py
+
+#LINE 7 FUNCTION CLASSIFY_PLANT_IMAGE FROM PLANT_API.PY NOT COPY
+
 import streamlit as st
 from weather_api import get_weekly_rainfall
-from copy_plant_api_test import classify_plant_image
+from plant_api import classify_plant_image
 from calendar_api import get_watering_schedule
 from PIL import Image
 from io import BytesIO
