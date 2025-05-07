@@ -1,5 +1,7 @@
 # app/plant_api.py
 
+# hardcode to test streamlit without ML (so to fix plant_api to return flowering plant)
+
 # import tensorflow as tf   # ← comment out for now
 # import numpy as np
 
