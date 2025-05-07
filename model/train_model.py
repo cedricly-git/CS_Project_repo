@@ -1,94 +1,143 @@
 import os
 import tensorflow as tf
+from tensorflow.keras import layers, models
+import matplotlib.pyplot as plt
 
 # === Step 1: Define paths and parameters ===
 script_dir = os.path.dirname(os.path.abspath(__file__))
-data_dir = os.path.join(script_dir, "plant_images")  # training images directory
+# plant_images sits alongside the model/ directory, so we go up one level then into it
+data_dir = os.path.join(script_dir, os.pardir, "plant_images")
+# --- SETUP MODEL OUTPUT PATHS ---
+# model_dir sits alongside plant_images/ and app/, one level up from here
+model_dir = os.path.join(script_dir, os.pardir, "model")
+# Create it if needed
+os.makedirs(model_dir, exist_ok=True)
+# The final .keras file will live here
+checkpoint_path = os.path.join(model_dir, "plant_classifier.keras")
 img_height = 224
-img_width = 224
+img_width  = 224
 batch_size = 8
-epochs = 10
-seed = 123
+epochs     = 10
+seed       = 123
 
 # === Step 2: Load training and validation data ===
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="training",
-    seed=seed,
-    image_size=(img_height, img_width),
-    batch_size=batch_size,
-    label_mode="int"   # labels as integer indices
+    seed=123,
+    image_size=img_size,
+    batch_size=batch_size
 )
+
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
     subset="validation",
-    seed=seed,
-    image_size=(img_height, img_width),
-    batch_size=batch_size,
-    label_mode="int"
+    seed=123,
+    image_size=img_size,
+    batch_size=batch_size
 )
 
-# Save the class names (should be ['Edible', 'Flower', 'Grass', 'Succulent', 'Tree'])
+# Save the class names (i.e. folder names like "Tree", "Flower")
 class_names = train_ds.class_names
-print(f"Classes found: {class_names}")
+print(f"Detected classes: {class_names}")
 
-# === Step 3: Prepare dataset for performance ===
-# Cache and prefetch for faster training, shuffle training data
+# === Step 3: Set up data performance and augmentation ===
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds = train_ds.cache().shuffle(100).prefetch(buffer_size=AUTOTUNE)
-val_ds   = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
-# === Step 4: Build the CNN model ===
-# Data augmentation layer (applied only during training)
+# Data augmentation layer: random flip, rotation, zoom
 data_augmentation = tf.keras.Sequential([
-    tf.keras.layers.RandomFlip("horizontal"),
-    tf.keras.layers.RandomRotation(0.1),
-    tf.keras.layers.RandomZoom(0.1),
-    tf.keras.layers.RandomContrast(0.1),
-    # tf.keras.layers.RandomBrightness(0.1)  # (optional) uncomment if using TF >= 2.10
+    layers.RandomFlip("horizontal"),
+    layers.RandomRotation(0.1),
+    layers.RandomZoom(0.1),
+    layers.RandomContrast(0.1),
+    layers.RandomBrightness(0.1),
 ])
-# Determine number of classes from the dataset
-num_classes = len(class_names)
 
-model = tf.keras.Sequential([
-    data_augmentation,  # apply augmentations
-    tf.keras.layers.Rescaling(1./255, input_shape=(img_height, img_width, 3)),  # normalize pixels
-    tf.keras.layers.Conv2D(32, 3, activation='relu'),
-    tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Conv2D(64, 3, activation='relu'),
-    tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Conv2D(128, 3, activation='relu'),
-    tf.keras.layers.MaxPooling2D(),
-    tf.keras.layers.Flatten(),
-    tf.keras.layers.Dense(128, activation='relu'),
-    tf.keras.layers.Dropout(0.5),  # reduce overfitting
-    tf.keras.layers.Dense(num_classes, activation='softmax')  # output layer
+# === Step 4: Build your CNN model ===
+model = models.Sequential([
+    data_augmentation,  # apply augmentations during training
+    layers.Rescaling(1./255, input_shape=(224, 224, 3)),  # normalize
+    layers.Conv2D(32, 3, activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(64, 3, activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Conv2D(256, 3, activation='relu'),
+    layers.MaxPooling2D(),
+    layers.Flatten(),
+    layers.Dense(128, activation='relu'),
+    layers.Dropout(0.5),  # helps prevent overfitting
+    layers.Dense(len(class_names), activation='softmax')  # output layer
 ])
 
 # === Step 5: Compile the model ===
 model.compile(
     optimizer='adam',
-    loss=tf.keras.losses.SparseCategoricalCrossentropy(),  # suitable for integer labels
+    loss='sparse_categorical_crossentropy',
     metrics=['accuracy']
 )
 
-# (Optional) Print a summary of the model architecture
-model.summary()
+from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+
+callbacks = [
+    ModelCheckpoint(
+        filepath=checkpoint_path,    # now relative to your repo
+        save_best_only=True
+    ),
+    ReduceLROnPlateau(
+        monitor='val_loss',
+        factor=0.5,
+        patience=3,
+        min_lr=1e-6,
+        verbose=1
+    ),
+]
 
 # === Step 6: Train the model ===
-print(f"\nStarting training for {epochs} epochs...")
 history = model.fit(
     train_ds,
     validation_data=val_ds,
-    epochs=epochs
+    epochs=50,
+    callbacks=callbacks
 )
 
-# === Step 7: Save the trained model ===
-# Ensure the target directory exists
-model_dir = os.path.join(script_dir, "model")
-os.makedirs(model_dir, exist_ok=True)
-model_save_path = os.path.join(model_dir, "plant_classifier.keras")
-model.save(model_save_path)
-print(f"\nModel training complete. Saved the model to {model_save_path}")
+# === Step 7: Plot training vs validation accuracy ===
+plt.plot(history.history['accuracy'], label='Train Accuracy')
+plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
+plt.title("Training Progress")
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.grid(True)
+plt.show()
+
+
+#CONFUSION MATRIX
+
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+
+# Step 1: Get true labels and predicted labels
+y_true = []
+y_pred = []
+
+for batch_images, batch_labels in val_ds:
+    preds = model.predict(batch_images)
+    y_true.extend(batch_labels.numpy())
+    y_pred.extend(np.argmax(preds, axis=1))
+
+# Build matrix
+cm = confusion_matrix(y_true, y_pred)
+
+# Plot
+plt.figure(figsize=(8, 6))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=class_names, yticklabels=class_names)
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.title("Confusion Matrix")
+plt.show()
