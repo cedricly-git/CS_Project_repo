@@ -24,11 +24,11 @@ if 'week_start' not in st.session_state:
     st.session_state.week_start = monday
 
 # --- Title & garden-name input ---
-st.title("Welcome to Plantelligence")
+st.title("Welcome to Plantelligence 🌱")
 garden_name = st.text_input("Name your garden:", key="garden_name")
 
 # --- Add-plant form ---
-st.subheader("Add a Plant to Your Garden")
+st.subheader("Add a Plant to Your Garden 🪴")
 with st.form("add_plant_form", clear_on_submit=True):
     plant_name = st.text_input("Plant Name", key="plant_name_input")
     plant_file = st.file_uploader(
@@ -56,7 +56,7 @@ if st.session_state.garden:
     garden = st.session_state.garden
 
     # 1) Garden overview gallery
-    title = f"Garden Overview: {garden_name}" if garden_name else "Garden Overview"
+    title = f"Garden Overview 🔍: {garden_name}" if garden_name else "Garden Overview 🔍"
     st.subheader(title)
     for i in range(0, len(garden), 3):
         cols = st.columns(3)
@@ -68,7 +68,7 @@ if st.session_state.garden:
     week_start = st.session_state.week_start
     # 2) Weekly rainfall + nav buttons
 
-    st.subheader("Weekly Rainfall Forecast")
+    st.subheader("Weekly Rainfall Forecast 🌧️")
     
     # B) Two columns: Prev button | Next button
     col1, col2 = st.columns([1, 5])
@@ -130,7 +130,7 @@ if st.session_state.garden:
     st.altair_chart(chart, use_container_width=True)
 
     # 6) Table
-    st.subheader("Weekly Watering Schedule")
+    st.subheader("Weekly Watering Schedule 🗓️")
     st.table(schedule_df)
 
 else:
