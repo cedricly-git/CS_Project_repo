@@ -40,15 +40,21 @@ if submitted:
     if not plant_name or not plant_file:
         st.warning("Please provide both a plant name and an image.")
     else:
-        # read bytes once
+        # 1) pull out the raw bytes
         image_bytes = plant_file.read()
-        img = Image.open(BytesIO(image_bytes)).convert("RGB")
-        plant_type = classify_plant_image(img)
+
+        # 2) classify from the raw bytes stream
+        plant_type = classify_plant_image(BytesIO(image_bytes))
+
+        # 3) now open a PIL image just for showing it
+        display_img = Image.open(BytesIO(image_bytes)).convert("RGB")
+
         st.session_state.garden.append({
             "name": plant_name,
             "type": plant_type,
             "image_bytes": image_bytes
         })
+        st.image(display_img, caption=f"{plant_type}: {plant_name}")
         st.success(f"Added **{plant_type}** “{plant_name}” to your garden.")
 
 # --- If we have at least one plant, show overview + charts ---

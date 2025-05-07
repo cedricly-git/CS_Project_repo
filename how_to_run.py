@@ -16,3 +16,7 @@
 
 #step 5
 # download a picture of a plant from the internet and have fun with the app
+
+
+# if want to train model
+# python model/train_model.py
