@@ -1,42 +1,43 @@
 # app/plant_api.py
 
 import os
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 from PIL import Image
 
-# === Step 1: Load the trained model ===
+# === Step 1: Locate and load the trained model ===
 script_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(script_dir, "model", "plant_classifier.keras")
-model = tf.keras.models.load_model(model_path)
-print("✅ Model loaded successfully.")
+# model directory sits alongside plant_images/ and app/, one level up
+model_dir = os.path.join(script_dir, os.pardir, "model")
+# path to the .keras model file
+model_path = os.path.join(model_dir, "plant_classifier.keras")
 
-# === Step 2: Define class names (same order as during training) ===
-class_names = ['Edible', 'Flower', 'Grass', 'Succulent', 'Tree']
+# Load the model once at import time
+_model = tf.keras.models.load_model(model_path)
 
-# === Step 3: Define the prediction function ===
-def classify_plant_image(image_file):
+# === Step 2: Define class names in the same order as training folders ===
+_CLASS_NAMES = ["Edible", "Flower", "Grass", "Succulent", "Tree"]
+
+# === Step 3: The prediction function ===
+def classify_plant_image(image_file) -> str:
     """
-    Classify an uploaded plant image into one of the predefined categories.
-    
-    Parameters:
-        image_file (UploadedFile): The image file uploaded via Streamlit.
-    Returns:
-        str: Predicted class label (e.g. 'Flower', 'Tree', etc.).
+    Accepts a Streamlit UploadedFile, preprocesses it,
+    runs inference, and returns one of the five class labels.
     """
-    # Reset file pointer and open the image
+    # 1) Reset file pointer & open with PIL
     image_file.seek(0)
     img = Image.open(image_file)
-    # Convert to RGB (in case image is RGBA or grayscale)
-    img = img.convert("RGB")
-    # Resize to match the model's expected input size
-    img = img.resize((224, 224))
-    # Convert image to numpy array and normalize pixel values
-    img_array = np.array(img) / 255.0
-    # Expand dimensions to simulate a batch of size 1
-    img_array = np.expand_dims(img_array, axis=0)
-    # Perform prediction
-    preds = model.predict(img_array)
-    predicted_index = np.argmax(preds[0])
-    predicted_label = class_names[predicted_index]
-    return predicted_label
+
+    # 2) Convert to RGB & resize to model's input size
+    img = img.convert("RGB").resize((224, 224))
+
+    # 3) Turn into array, normalize to [0,1], add batch dim
+    arr = np.array(img, dtype=np.float32) / 255.0
+    arr = np.expand_dims(arr, axis=0)  # shape (1,224,224,3)
+
+    # 4) Run inference
+    preds = _model.predict(arr)
+    idx = int(np.argmax(preds[0]))
+
+    # 5) Map to human-readable label
+    return _CLASS_NAMES[idx]
