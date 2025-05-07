@@ -105,7 +105,7 @@ if st.session_state.garden:
     df_rain["Date"] = pd.Categorical(df_rain["Date"], categories=dates, ordered=True)
     df_rain = df_rain.set_index("Date")
 
-    st.bar_chart(df_rain["Rain (mm)"], height=200)
+    
 
     # 3) Fetch rainfall
     try:
