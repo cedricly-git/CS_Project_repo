@@ -72,11 +72,9 @@ if st.session_state.garden:
     with prev_col:
         if st.button("← Previous Week"):
             st.session_state.week_start -= timedelta(days=7)
-            st.experimental_rerun()
     with next_col:
         if st.button("Next Week →"):
             st.session_state.week_start += timedelta(days=7)
-            st.experimental_rerun()
 
     # 3) Fetch rainfall
     try:
