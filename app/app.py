@@ -86,7 +86,7 @@ if st.session_state.garden:
         weekly_rain = [0.0]*7
 
     # 4) Compute consolidated watering schedule
-    schedule_df = get_watering_schedule(garden, weekly_rain)
+    schedule_df = get_watering_schedule(garden, weekly_rain, st.session_state.week_start)
 
     # 5) Chart
     days_order = schedule_df["Day"].tolist()
