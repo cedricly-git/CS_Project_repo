@@ -65,47 +65,31 @@ if st.session_state.garden:
                 st.image(plant["image_bytes"], width=150)
                 st.caption(f"{plant['name']} – {plant['type']}")
 
-    # 1.1) Fetch rainfall & build df_rain BEFORE we show the chart
     week_start = st.session_state.week_start
-
-    try:
-        daily_rain = get_weekly_rainfall(week_start)
-    except Exception:
-        daily_rain = [0]*7
-
-    dates = [
-        (week_start + datetime.timedelta(days=i)).strftime("%a %d %b")
-        for i in range(7)
-    ]
-    df_rain = pd.DataFrame({"Date": dates, "Rain (mm)": daily_rain})
-    df_rain["Date"] = pd.Categorical(df_rain["Date"], categories=dates, ordered=True)
-    df_rain = df_rain.set_index("Date")
-
     # 2) Weekly rainfall + nav buttons
 
     st.subheader("Weekly Rainfall Forecast")
     
-    # B) Three columns: Prev button | week label | Next button
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # B) Two columns: Prev button | Next button
+    col1, col2 = st.columns([1, 5])
 
     with col1:
         if st.button("← Previous Week", key="prev_week"):
             st.session_state.week_start -= datetime.timedelta(days=7)
 
     with col2:
-        wk_start = st.session_state.week_start
-        wk_end   = wk_start + datetime.timedelta(days=6)
-        st.markdown(
-            f"<div style='text-align:center; font-weight:bold;'>"
-            f"Week of {wk_start.strftime('%B')} {wk_start.day} – "
-            f"{wk_end.strftime('%B')} {wk_end.day}, {wk_end.year}"
-            f"</div>",
-            unsafe_allow_html=True,
-        )
-
-    with col3:
         if st.button("Next Week →", key="next_week"):
             st.session_state.week_start += datetime.timedelta(days=7)
+
+    # Week label
+    wk_start = st.session_state.week_start
+    wk_end   = wk_start + datetime.timedelta(days=6)
+    st.markdown(
+        f"<div style='text-align:center; font-weight:bold;'>"
+        f"Week of {wk_start.strftime('%B')} {wk_start.day} – "
+        f"{wk_end.strftime('%B')} {wk_end.day}, {wk_end.year}"
+        f"</div>",
+        unsafe_allow_html=True,)
 
     # C) Now the rainfall bar chart, full width
     st.bar_chart(df_rain["Rain (mm)"], height=200)
