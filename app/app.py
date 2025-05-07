@@ -68,13 +68,24 @@ if st.session_state.garden:
     week_start = st.session_state.week_start
 
     st.subheader("Weekly Rainfall Forecast")
-    prev_col, next_col = st.columns(2)
-    with prev_col:
+    
+    # B) Three columns: Prev button | week label | Next button
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col1:
         if st.button("← Previous Week"):
-            st.session_state.week_start -= timedelta(days=7)
-    with next_col:
+            st.session_state.week_start -= datetime.timedelta(days=7)
+    with col2:
+        # compute week start/end
+        wk_start = st.session_state.week_start
+        wk_end   = wk_start + datetime.timedelta(days=6)
+        # display nicely
+        st.markdown(
+            f"**Week of {wk_start.strftime('%B')} {wk_start.day} – "
+            f"{wk_end.strftime('%B')} {wk_end.day}, {wk_end.year}**"
+        )
+    with col3:
         if st.button("Next Week →"):
-            st.session_state.week_start += timedelta(days=7)
+            st.session_state.week_start += datetime.timedelta(days=7)
 
     # 3) Fetch rainfall
     try:
