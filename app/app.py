@@ -92,6 +92,19 @@ if st.session_state.garden:
         unsafe_allow_html=True,)
 
     # C) Now the rainfall bar chart, full width
+    try:
+        daily_rain = get_weekly_rainfall(week_start)
+    except Exception:
+        daily_rain = [0] * 7
+
+    dates = [
+        (week_start + datetime.timedelta(days=i)).strftime("%a %d %b")
+        for i in range(7)
+    ]
+    df_rain = pd.DataFrame({"Date": dates, "Rain (mm)": daily_rain})
+    df_rain["Date"] = pd.Categorical(df_rain["Date"], categories=dates, ordered=True)
+    df_rain = df_rain.set_index("Date")
+
     st.bar_chart(df_rain["Rain (mm)"], height=200)
 
     # 3) Fetch rainfall
