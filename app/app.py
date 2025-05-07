@@ -12,7 +12,7 @@ from plant_api import classify_plant_image
 from weather_api import get_weekly_rainfall
 from calendar_api import get_watering_schedule
 
-# --- Page config & session-state init ---
+# --- Page config & session-state init --- 
 st.set_page_config(page_title="Plantelligence", layout="centered")
 
 if 'garden' not in st.session_state:
