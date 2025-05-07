@@ -71,7 +71,7 @@ if st.session_state.garden:
     st.subheader("Weekly Rainfall Forecast 🌧️")
     
     # B) Two columns: Prev button | Next button
-    col1, col2 = st.columns([1, 5])
+    col1, col2 = st.columns([1, 1])
 
     with col1:
         if st.button("← Previous Week", key="prev_week"):
