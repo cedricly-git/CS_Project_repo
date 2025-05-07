@@ -14,8 +14,7 @@ model_dir = os.path.join(script_dir, os.pardir, "model")
 os.makedirs(model_dir, exist_ok=True)
 # The final .keras file will live here
 checkpoint_path = os.path.join(model_dir, "plant_classifier.keras")
-img_height = 224
-img_width  = 224
+img_size = (224, 224)
 batch_size = 8
 epochs     = 10
 seed       = 123
