@@ -10,9 +10,9 @@ import altair as alt
 import sys
 import os
 
+from plant_api import classify_plant_image
 from weather_api import get_weekly_rainfall
 from calendar_api import get_watering_schedule
-from predict_2 import classify_plant_image
 
 # --- Page config & session-state init --- 
 st.set_page_config(page_title="Plantelligence", layout="centered")

@@ -38,9 +38,10 @@ val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
 
 # Data augmentation layer: random flip, rotation, zoom
 data_augmentation = tf.keras.Sequential([
-    layers.RandomFlip("horizontal"),
-    layers.RandomRotation(0.1),
-    layers.RandomZoom(0.1),
+    layers.RandomFlip("horizontal_and_vertical"),
+    layers.RandomRotation(0.3),
+    layers.RandomZoom(0.2),
+    layers.RandomTranslation(0.1, 0.1),
     layers.RandomContrast(0.1),
     layers.RandomBrightness(0.1),
 ])
@@ -71,7 +72,7 @@ model.compile(
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, ReduceLROnPlateau
 
 callbacks = [
-    #EarlyStopping(patience=10, restore_best_weights=True),
+    EarlyStopping(patience=10, restore_best_weights=True),
     ModelCheckpoint(filepath="/Users/graceyan/Downloads/St.Gallen /STUFF/plant_classifier.keras", save_best_only=True),
     ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6, verbose=1)
 ]
