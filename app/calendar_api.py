@@ -25,18 +25,14 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date) -> p
         # import single-plant logic
         from calendar_api import SIGNIFICANT_RAIN_THRESHOLD as THRESH
         # Determine max dry days by type
-        if plant_type == "Cacti/Succulents":
+        if plant_type == "Succulent":
             max_dry = 14
-        elif plant_type == "Grasses/Lawns":
+        elif plant_type == "Grass":
             max_dry = 7
-        elif plant_type in ["Flowering Plants", "Fruiting Plants"]:
+        elif plant_type in ["Flower", "Edible"]:
             max_dry = 3
-        elif plant_type == "Trees/Shrubs":
+        elif plant_type == "Tree":
             max_dry = 10
-        elif plant_type == "Ferns/Mosses":
-            max_dry = 2
-        else:
-            max_dry = 7
         # Decide watering
         if recent_rain >= THRESH:
             return False, 0
