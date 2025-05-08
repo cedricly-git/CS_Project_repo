@@ -38,3 +38,4 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float = DEFAULT_LAT
         raise Exception("Unexpected response format from Meteomatics API") from e
 
     return daily_rain
+
