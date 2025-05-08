@@ -54,8 +54,8 @@ if submitted:
             "type": plant_type,
             "image_bytes": image_bytes
         })
-        st.image(display_img, caption=f"{plant_type}: {plant_name}")
-        st.success(f"Added **{plant_type}** “{plant_name}” to your garden.")
+        st.image(display_img, caption=f"{plant_name}: {plant_type}")
+        st.success(f"Added **{plant_name}** “{plant_type}” to your garden.")
 
 # --- If we have at least one plant, show overview + charts ---
 if st.session_state.garden:
@@ -86,6 +86,8 @@ if st.session_state.garden:
     with col2:
         if st.button("Next Week →", key="next_week"):
             st.session_state.week_start += datetime.timedelta(days=7)
+
+    week_start = st.session_state.week_start
 
     # Week label
     wk_start = st.session_state.week_start
