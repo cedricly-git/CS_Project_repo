@@ -71,3 +71,4 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date) -> p
         "Watering Advice": advice
     })
     return df
+
