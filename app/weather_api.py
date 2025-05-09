@@ -3,14 +3,25 @@
 import requests
 import datetime
 
-METEO_USER = "universityofstgallen_soerensen_johann"   
-METEO_PASS = "iDV83e4R6e"
+METEO_USER = "universityofstgallen_yan_grace"   
+METEO_PASS = "2XPaF66p7o"
 
-# Define a default location (St.Gallen, Switzerland) for weather data (latitude, longitude)
-DEFAULT_LAT = 47.4245
-DEFAULT_LON = 9.3767
+# 0) a tiny free geocoder (no API key) for “city → lat, lon”
+def geocode(city: str) -> tuple[float, float]:
+    """Use Open-Meteo’s geocoding to turn a city name into (lat, lon)."""
+    resp = requests.get(
+        "https://geocoding-api.open-meteo.com/v1/search",
+        params={"name": city, "count": 1}
+    )
+    resp.raise_for_status()
+    results = resp.json().get("results")
+    if not results:
+        # fallback to St Gallen if nothing found
+        return 47.4245, 9.3767
+    best = results[0]
+    return float(best["latitude"]), float(best["longitude"])
 
-def get_weekly_rainfall(week_start_date: datetime.date, lat: float = DEFAULT_LAT, lon: float = DEFAULT_LON) -> list:
+def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) -> list:
     """Fetch daily rainfall (in mm) for 7 days starting from week_start_date (inclusive) at the given location.
     Returns a list of 7 rainfall values (mm) for each day."""
     # Construct the Meteomatics API URL for daily precipitation (24h accumulated) 
@@ -38,4 +49,3 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float = DEFAULT_LAT
         raise Exception("Unexpected response format from Meteomatics API") from e
 
     return daily_rain
-
