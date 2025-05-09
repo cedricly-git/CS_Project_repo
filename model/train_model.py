@@ -3,23 +3,18 @@ import tensorflow as tf
 from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt
 
-# === Step 1: Define paths and parameters ===
+# Step 1: Define paths and parameters
 script_dir = os.path.dirname(os.path.abspath(__file__))
-# plant_images sits alongside the model/ directory, so we go up one level then into it
 data_dir = os.path.join(script_dir, os.pardir, "plant_images")
-# --- SETUP MODEL OUTPUT PATHS ---
-# model_dir sits alongside plant_images/ and app/, one level up from here
 model_dir = os.path.join(script_dir, os.pardir, "model")
-# Create it if needed
 os.makedirs(model_dir, exist_ok=True)
-# The final .keras file will live here
 checkpoint_path = os.path.join(model_dir, "plant_classifier.keras")
 img_size = (224, 224)
 batch_size = 8
 epochs     = 10
 seed       = 123
 
-# === Step 2: Load training and validation data ===
+# Step 2: Load training and validation data
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
@@ -38,11 +33,11 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     batch_size=batch_size
 )
 
-# Save the class names (i.e. folder names like "Tree", "Flower")
+# Save the class names ("Edible", "Succulent","Grass" , "Tree", "Flower")
 class_names = train_ds.class_names
 print(f"Detected classes: {class_names}")
 
-# === Step 3: Set up data performance and augmentation ===
+# Step 3: Set up data performance and augmentation
 AUTOTUNE = tf.data.AUTOTUNE
 train_ds = train_ds.cache().shuffle(100).prefetch(buffer_size=AUTOTUNE)
 val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
@@ -56,7 +51,7 @@ data_augmentation = tf.keras.Sequential([
     layers.RandomBrightness(0.1),
 ])
 
-# === Step 4: Build your CNN model ===
+# Step 4: Build your CNN model
 model = models.Sequential([
     data_augmentation,  # apply augmentations during training
     layers.Rescaling(1./255, input_shape=(224, 224, 3)),  # normalize
@@ -72,7 +67,7 @@ model = models.Sequential([
     layers.Dense(len(class_names), activation='softmax')  # output layer
 ])
 
-# === Step 5: Compile the model ===
+# Step 5: Compile the model
 model.compile(
     optimizer='adam',
     loss='sparse_categorical_crossentropy',
@@ -83,7 +78,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 callbacks = [
     ModelCheckpoint(
-        filepath=checkpoint_path,    # now relative to your repo
+        filepath=checkpoint_path,
         save_best_only=True
     ),
     ReduceLROnPlateau(
@@ -95,7 +90,7 @@ callbacks = [
     ),
 ]
 
-# === Step 6: Train the model ===
+# Step 6: Train the model
 history = model.fit(
     train_ds,
     validation_data=val_ds,
@@ -103,7 +98,7 @@ history = model.fit(
     callbacks=callbacks
 )
 
-# === Step 7: Plot training vs validation accuracy ===
+# Step 7: Plot training vs validation accuracy
 plt.plot(history.history['accuracy'], label='Train Accuracy')
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
 plt.title("Training Progress")
