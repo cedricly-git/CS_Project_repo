@@ -2,7 +2,7 @@
 from datetime import timedelta
 import pandas as pd
 
-SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm considered heavy rain
+SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm considered sufficient rain to water the plants
 
 
 def get_watering_schedule(garden: list, weekly_rain: list, week_start_date) -> pd.DataFrame:
@@ -28,11 +28,13 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date) -> p
         if plant_type == "Succulent":
             max_dry = 14
         elif plant_type == "Grass":
-            max_dry = 7
-        elif plant_type in ["Flower", "Edible"]:
-            max_dry = 3
+            max_dry = 6
+        elif plant_type == "Flower":
+            max_dry = 2
+        elif plant_type == "Edible":
+            max_dry = 4
         elif plant_type == "Tree":
-            max_dry = 10
+            max_dry = 9
         # Decide watering
         if recent_rain >= THRESH:
             return False, 0

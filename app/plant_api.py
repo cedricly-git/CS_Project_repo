@@ -7,16 +7,13 @@ import numpy as np
 import tensorflow as tf
 from PIL import Image
 
-# — Step 1: locate & load your .keras model —
+# — Step 1: locate & load the .keras model —
 script_dir = os.path.dirname(os.path.abspath(__file__))
-# model_dir sits alongside app/ and plant_images/, one level up
 model_dir = os.path.join(script_dir, os.pardir, "model")
 model_path = os.path.join(model_dir, "plant_classifier.keras")
-
-# load once at import time
 _model = tf.keras.models.load_model(model_path)
 
-# — Step 2: class names in the same order as your training folders —
+# — Step 2: class names in the same order as the training folders —
 _CLASS_NAMES = ["Edible", "Flower", "Grass", "Succulent", "Tree"]
 
 def classify_plant_image(image_bytes: bytes) -> str:

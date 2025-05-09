@@ -74,7 +74,7 @@ if st.session_state.garden:
                 st.caption(f"{plant['name']} – {plant['type']}")
 
     week_start = st.session_state.week_start
-    # 2) Weekly rainfall + nav buttons
+    # 2) Weekly rainfall + week navigation buttons
 
     st.subheader("Weekly Rainfall Forecast 🌧️")
     
@@ -101,7 +101,7 @@ if st.session_state.garden:
         f"</div>",
         unsafe_allow_html=True,)
 
-    # C) Now the rainfall bar chart, full width
+    # C) Rainfall bar chart
     try:
         daily_rain = get_weekly_rainfall(week_start)
     except Exception:
@@ -117,17 +117,17 @@ if st.session_state.garden:
 
     
 
-    # 3) Fetch rainfall
+    # -> 3) Fetch rainfall
     try:
         weekly_rain = get_weekly_rainfall(week_start)
     except Exception as e:
         st.error(f"Error fetching weather data: {e}")
         weekly_rain = [0.0]*7
 
-    # 4) Compute consolidated watering schedule
+    # -> 4) Compute consolidated watering schedule
     schedule_df = get_watering_schedule(garden, weekly_rain, st.session_state.week_start)
 
-    # 5) Chart
+    # -> 5) Chart
     days_order = schedule_df["Day"].tolist()
     chart = (
         alt.Chart(schedule_df)
@@ -139,7 +139,7 @@ if st.session_state.garden:
     )
     st.altair_chart(chart, use_container_width=True)
 
-    # 6) Table
+    # Table with watering schedule
     st.subheader("Weekly Watering Schedule 🗓️")
     st.table(schedule_df)
 
