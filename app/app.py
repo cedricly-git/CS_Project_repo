@@ -1,4 +1,4 @@
-# app.py
+# app/app.py
 
 import streamlit as st
 import datetime
@@ -16,6 +16,9 @@ from calendar_api import get_watering_schedule
 # --- Page config ---
 st.set_page_config(page_title="Plantelligence 🌱", layout="centered")
 
+
+
+
 # --- Session State Init ---
 if 'garden' not in st.session_state:
     st.session_state.garden = []
@@ -28,6 +31,8 @@ if 'week_start' not in st.session_state:
 if "checklist_states" not in st.session_state:
     st.session_state.checklist_states = {}
 
+
+
 # --- App Title ---
 st.title("Welcome to Plantelligence 🌱")
 garden_name = st.text_input("Name your garden:", key="garden_name")
@@ -36,6 +41,7 @@ with st.sidebar:
     st.header("Weather Settings 🌍")
     city = st.text_input("In which city is your garden?:", value="St. Gallen")
 lat, lon = geocode(city)
+
 
 # --- Add Plant Form ---
 st.subheader("🪴 Add a Plant to Your Garden")
@@ -102,11 +108,14 @@ if st.session_state.garden:
                     <span style="color:gray; font-size:14px;">{icon} {plant_type}</span>
                 </div>
             """, unsafe_allow_html=True)
-
-    # --- Weekly Rainfall Forecast Section ---
+            
+     # --- Weekly Rainfall Forecast Section ---
     st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
-    st.subheader("Weekly Rainfall Forecast 🌧️")
+    # 2) Weekly rainfall + nav buttons
 
+    st.subheader("Weekly Rainfall Forecast 🌧️")
+    
+    # B) Two columns: Prev button | Next button
     col1, col2 = st.columns([1, 3])
 
     with col1:
@@ -140,23 +149,21 @@ if st.session_state.garden:
         st.error(f"Error fetching weather data: {e}")
         weekly_rain = [0.0] * 7
 
-    # 3) Check if watering schedule needs to be recalculated
-    week_key = str(st.session_state.week_start)
-    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key:
-        schedule_df, new_counters = get_watering_schedule(
-            st.session_state.garden,
-            weekly_rain,
-            st.session_state.week_start,
-            st.session_state.plant_counters
-        )
-        st.session_state.watering_schedule = schedule_df
-        st.session_state.plant_counters = new_counters
-        st.session_state.watering_schedule_key = week_key
+    # 3) compute watering schedule & updated counters
+    schedule_df, new_counters = get_watering_schedule(
+        st.session_state.garden,
+        weekly_rain,
+        st.session_state.week_start,
+        st.session_state.plant_counters
+    )
 
-    # 4) Chart
-    days_order = st.session_state.watering_schedule["Day"].tolist()
+    # 4) persist those counters for next time
+    st.session_state.plant_counters = new_counters
+
+    # 5) Chart
+    days_order = schedule_df["Day"].tolist()
     chart = (
-        alt.Chart(st.session_state.watering_schedule)
+        alt.Chart(schedule_df)
           .mark_bar()
           .encode(
               x=alt.X("Day", sort=days_order, title="Day"),
@@ -178,7 +185,13 @@ if st.session_state.garden:
 
     st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True)
 
-    for idx, row in st.session_state.watering_schedule.iterrows():
+    week_key = str(st.session_state.week_start)
+    if "checklist_states" not in st.session_state:
+        st.session_state.checklist_states = {}
+    if week_key not in st.session_state.checklist_states:
+        st.session_state.checklist_states[week_key] = [False] * len(schedule_df)
+
+    for idx, row in schedule_df.iterrows():
         cols = st.columns([2, 2, 2, 3, 2])
         cols[0].write(row["Day"])
         cols[1].write(row["Date"])
@@ -194,9 +207,67 @@ if st.session_state.garden:
         if week_key not in st.session_state.checklist_states:
             st.session_state.checklist_states[week_key] = [False]*7
         st.session_state.checklist_states[week_key][idx] = checked
-        
         # Add line after each row
         st.markdown("<hr style='border: 1px solid #eee; margin: 5px 0;'>", unsafe_allow_html=True)
+        
+  
+
 
 else:
     st.info("📷 Please add at least one plant to your garden above.")
+
+
+st.markdown("""
+    <style>
+    .block-container {
+        margin-right: 350px;  /* Moves the content left but keeps full width */
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Calculate Stats
+total_plants = len(st.session_state.garden)
+total_weeks = len(st.session_state.get("checklist_states", {}))
+current_week = st.session_state.week_start.strftime("%B %d, %Y")
+completed_tasks = sum(
+    st.session_state.checklist_states.get(str(st.session_state.week_start), [])
+) if "checklist_states" in st.session_state else 0
+
+# Add Floating Widget CSS + HTML
+st.markdown(f"""
+    <style>
+    .floating-widget {{
+        position: fixed;
+        top: 100px;
+        right: 30px;
+        width: 280px;
+        padding: 20px;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 12px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        z-index: 100;
+        font-family: 'Helvetica Neue', sans-serif;
+    }}
+    .floating-widget h4 {{
+        color: #333333;
+        font-size: 20px;
+        margin-bottom: 20px;
+    }}
+    .floating-widget p {{
+        margin: 8px 0;
+        color: #555555;
+        font-weight: 500;
+        font-size: 15px;
+    }}
+    </style>
+
+    <div class="floating-widget">
+        <h4>📊 {garden_name if garden_name else "Garden Overview"}'s Statistics</h4>
+        <p>Total Plants: {total_plants}</p>
+        <p>Weeks Tracked: {total_weeks}</p>
+        <p>Current Week:<br>{current_week}</p>
+        <p>Tasks Completed This Week: {completed_tasks}</p>
+    </div>
+""", unsafe_allow_html=True)
+
