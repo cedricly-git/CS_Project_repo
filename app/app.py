@@ -170,18 +170,19 @@ if st.session_state.garden:
 
     # 3) compute watering schedule & updated counters
     # This section computes the watering schedule based on the weekly rainfall data and the user's garden.
-    schedule_df, new_counters = get_watering_schedule(
-        st.session_state.garden,
-        weekly_rain,
-        st.session_state.week_start,
-        st.session_state.plant_counters
-    )
+    week_key = str(st.session_state.week_start)
+    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key:
+        schedule_df, new_counters = get_watering_schedule(
+            st.session_state.garden,
+            weekly_rain,
+            st.session_state.week_start,
+            st.session_state.plant_counters
+        )
+        st.session_state.watering_schedule = schedule_df
+        st.session_state.plant_counters = new_counters
+        st.session_state.watering_schedule_key = week_key
 
-    # 4) persist those counters for next time
-    # This section updates the plant counters in the session state.
-    st.session_state.plant_counters = new_counters
-
-    # 5) Chart
+    # 4) Chart
     # This section creates a bar chart to visualize the weekly rainfall data.
     days_order = schedule_df["Day"].tolist()
     chart = (
