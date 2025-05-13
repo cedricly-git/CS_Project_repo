@@ -208,22 +208,15 @@ if st.session_state.garden:
 
     st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True)
 
-    # This section creates a checklist for the user to track their watering tasks.
-    week_key = str(st.session_state.week_start)
-    if "checklist_states" not in st.session_state:
-        st.session_state.checklist_states = {}
-    if week_key not in st.session_state.checklist_states:
-        st.session_state.checklist_states[week_key] = [False] * len(schedule_df)
-
-    for idx, row in schedule_df.iterrows():
+    # This section creates a checklist for each day of the week, allowing the user to mark tasks as completed.
+    for idx, row in st.session_state.watering_schedule.iterrows():
         cols = st.columns([2, 2, 2, 3, 2])
         cols[0].write(row["Day"])
         cols[1].write(row["Date"])
         cols[2].write(f"{row['Rain (mm)']} mm")
         cols[3].write(row["Watering Advice"])
 
-        # This section creates a checkbox for the user to mark tasks as completed.
-        # The checkbox state is stored in the session state.
+        # This section creates a checkbox for the personal checklist.
         checked = cols[4].checkbox(
             label="",
             value=st.session_state.checklist_states.get(week_key, [False]*7)[idx],
@@ -233,12 +226,11 @@ if st.session_state.garden:
         if week_key not in st.session_state.checklist_states:
             st.session_state.checklist_states[week_key] = [False]*7
         st.session_state.checklist_states[week_key][idx] = checked
+        
         # Add line after each row
         st.markdown("<hr style='border: 1px solid #eee; margin: 5px 0;'>", unsafe_allow_html=True)
-        
-  
 
-#This section displays a message if no plants have been added to the garden.
+# This section creates a download button for the weekly watering schedule.
 else:
     st.info("📷 Please add at least one plant to your garden above.")
 
