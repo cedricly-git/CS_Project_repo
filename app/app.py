@@ -198,11 +198,14 @@ if st.session_state.garden:
         cols[2].write(f"{row['Rain (mm)']} mm")
         cols[3].write(row["Watering Advice"])
 
-        st.session_state.checklist_states[week_key][idx] = cols[4].checkbox("", 
-                                                                            value=st.session_state.checklist_states[week_key][idx],
-                                                                            key=f"personal_check_{week_key}_{idx}"
-                                                                            )
+        checked = cols[4].checkbox(
+            label="",
+            value=st.session_state.checklist_states[week_key][idx],
+            key=f"personal_check_{week_key}_{idx}"
 
+        )
+        st.session_state.checklist_states[week_key][idx] = checked
+        
         # Add line after each row
         st.markdown("<hr style='border: 1px solid #eee; margin: 5px 0;'>", unsafe_allow_html=True)
         
@@ -266,3 +269,4 @@ st.markdown(f"""
         <p>Tasks Completed This Week: {completed_tasks}</p>
     </div>
 """, unsafe_allow_html=True)
+
