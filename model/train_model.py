@@ -4,6 +4,7 @@ from tensorflow.keras import layers, models
 import matplotlib.pyplot as plt
 
 # Step 1: Define paths and parameters
+# Define the path to the dataset and model directory
 script_dir = os.path.dirname(os.path.abspath(__file__))
 data_dir = os.path.join(script_dir, os.pardir, "plant_images")
 model_dir = os.path.join(script_dir, os.pardir, "model")
@@ -15,6 +16,7 @@ epochs     = 10
 seed       = 123
 
 # Step 2: Load training and validation data
+# Load the dataset from the directory
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
@@ -24,6 +26,7 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
     batch_size=batch_size
 )
 
+# Load the validation dataset
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
     data_dir,
     validation_split=0.2,
@@ -135,3 +138,8 @@ plt.xlabel("Predicted Label")
 plt.ylabel("True Label")
 plt.title("Confusion Matrix")
 plt.show()
+
+#Reference:
+#https://www.tensorflow.org/tutorials/images/classification
+#The code for training the plant image classification model was adapted from the official TensorFlow tutorial:"Image classification" (TensorFlow Tutorials).
+# Modifications were made by the author to fit the specific dataset (plant_images), add data augmentation, implement model checkpointing, and generate a confusion matrix for performance evaluation.
