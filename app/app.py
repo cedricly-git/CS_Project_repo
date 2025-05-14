@@ -336,4 +336,3 @@ st.markdown(f"""
         <p>Tasks Completed This Week: {completed_tasks}</p>
     </div>
 """, unsafe_allow_html=True)
-
