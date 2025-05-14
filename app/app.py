@@ -2,8 +2,7 @@
 # This is the main application file for Plantelligence, a plant care assistant.
 # It allows users to add plants, view their garden, and get weekly watering schedules based on weather data.
 # The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification and weather data.
-# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
-# https://openai.com
+
 
 # --- References & Credits ---
 # Streamlit for building interactive web apps
@@ -31,8 +30,23 @@
 # base64 - built-in Python module for base64 encoding/decoding
 # https://docs.python.org/3/library/base64.html
 
+# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# https://openai.com
+
+# --- Project Structure ---
+# ├── app.py                # Main application file
+# ├── plant_api.py          # Plant classification API
+# ├── weather_api.py        # Weather data API
+# ├── calendar_api.py       # Calendar and scheduling API
+# ├── model (folder)        # the code for training model & the .keras file, the train model
+# ├── requirements.txt      # Python package dependencies
 
 # --- Import necessary libraries ---
+# We use Streamlit for the web app, datetime for date handling, pandas for data manipulation,
+# We use datetime and timedelta for date calculations, BytesIO for in-memory file handling,
+# We use pandas for data manipulation, and PIL for image processing.
+# We use altair for data visualization, and base64 for encoding images.
+# We use base64 for encoding images.
 import streamlit as st
 import datetime
 import pandas as pd
@@ -192,21 +206,25 @@ if st.session_state.garden:
     # 3) Check if watering schedule needs to be recalculated
     # This section checks if the watering schedule needs to be recalculated based on the week start date.
     # If the week start date has changed, recalculate the schedule.
-    week_key = str(st.session_state.week_start)
-    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key:
+    week_key = str(st.session_state.week_start) # convert the current week's start date to string for use as a key
+    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key: # check if the schedule is already calculated
+        # If not, calculate the watering schedule
         schedule_df, new_counters = get_watering_schedule(
             st.session_state.garden,
             weekly_rain,
             st.session_state.week_start,
             st.session_state.plant_counters
         )
+        # Store the new schedule and counters in session state
         st.session_state.watering_schedule = schedule_df
         st.session_state.plant_counters = new_counters
         st.session_state.watering_schedule_key = week_key
+    # Store everything in session state
 
     # 4) Chart
+    # use the package altair to create a bar chart
     # This section creates a bar chart to visualize the weekly rainfall data.
-    days_order = st.session_state.watering_schedule["Day"].tolist()
+    days_order = st.session_state.watering_schedule["Day"].tolist() # Get the order of days from the DataFrame
     chart = (
         alt.Chart(st.session_state.watering_schedule)
           .mark_bar()
@@ -214,15 +232,15 @@ if st.session_state.garden:
               x=alt.X("Day", sort=days_order, title="Day"),
               y=alt.Y("Rain (mm)", title="Rain (mm)"),
           )
-    )
-    st.altair_chart(chart, use_container_width=True)
+    ) # Create a bar chart with days on the x-axis and rainfall on the y-axis
+    st.altair_chart(chart, use_container_width=True) # Display the chart with altair
 
-    st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True) # Add space between chart and table
 
     # --- Weekly Watering Schedule Table ---
     # This section displays the weekly watering schedule in a table format.
     # The table includes the day, date, rainfall amount, watering advice, and a personal checklist.
-    # The variables are displaed in columns
+    # The variables are displaed in columns for column 0 we have the day, column 1 the date, column 2 the rain amount, column 3 the watering advice and column 4 a personal checklist
     st.subheader("📅 Weekly Watering Schedule")
     header_cols = st.columns([2, 2, 2, 3, 2])
     header_cols[0].write("**Day**")
@@ -231,11 +249,10 @@ if st.session_state.garden:
     header_cols[3].write("**Watering Advice**")
     header_cols[4].write("**Personal Checklist**")
 
-    # Add line after the header
-    st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True)
+    st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True) # Add line after header
 
     #   This section iterates through the watering schedule DataFrame and displays each row in a column format.
-    for idx, row in st.session_state.watering_schedule.iterrows():
+    for idx, row in st.session_state.watering_schedule.iterrows(): 
         cols = st.columns([2, 2, 2, 3, 2])
         cols[0].write(row["Day"])
         cols[1].write(row["Date"])
@@ -248,15 +265,16 @@ if st.session_state.garden:
             key=f"personal_check_{week_key}_{idx}"
         )
         # Update checklist state on user interaction
-        if week_key not in st.session_state.checklist_states:
-            st.session_state.checklist_states[week_key] = [False]*7
-        st.session_state.checklist_states[week_key][idx] = checked
+        if week_key not in st.session_state.checklist_states: # Checks if the checklist_states dictionary does not yet contain an entry for the current
+            st.session_state.checklist_states[week_key] = [False]*7 # If the week is new, it initializes a checklist with 7 False values, one for each day of the week.
+        st.session_state.checklist_states[week_key][idx] = checked # Updates the checklist for the current week, marks the specific day as checked or unchecked based on user input.
         
         # Add line after each row
         st.markdown("<hr style='border: 1px solid #eee; margin: 5px 0;'>", unsafe_allow_html=True)
 
 else:
-    st.info("📷 Please add at least one plant to your garden above.")
+    st.info("📷 Please add at least one plant to your garden above.") # tell the user to add a plant if none are added
+
 
 # --- Overlay Widget ---
 # This section adds a floating widget to display the garden statistics.
