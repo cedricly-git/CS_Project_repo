@@ -1,4 +1,4 @@
-# Calendar Feature
+# --- Calendar Feature ---
 # This module provides a function to compute a watering schedule for a garden based on weekly rainfall.
 # It takes into account the type of plants, their watering needs, and the amount of rain received.
 from datetime import timedelta
@@ -82,7 +82,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     })
     return df, updated_counters
 
-#Refrence:
-#https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html
-#This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
-#Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
+# --- Reference ---
+# https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html
+# This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
+# Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.

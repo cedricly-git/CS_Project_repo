@@ -1,3 +1,8 @@
+# --- Plant Image Classification Model Training ---
+# This script trains a convolutional neural network (CNN) to classify plant images into different categories.
+# The model is trained using TensorFlow and Keras, with data augmentation and model checkpointing.
+# The dataset is expected to be organized in a directory structure where each subdirectory contains images of a specific class.
+
 import os
 import tensorflow as tf
 from tensorflow.keras import layers, models
@@ -139,7 +144,7 @@ plt.ylabel("True Label")
 plt.title("Confusion Matrix")
 plt.show()
 
-#Reference:
-#https://www.tensorflow.org/tutorials/images/classification
-#The code for training the plant image classification model was adapted from the official TensorFlow tutorial:"Image classification" (TensorFlow Tutorials).
+# --- Reference ---
+# https://www.tensorflow.org/tutorials/images/classification
+# The code for training the plant image classification model was adapted from the official TensorFlow tutorial:"Image classification" (TensorFlow Tutorials).
 # Modifications were made by the author to fit the specific dataset (plant_images), add data augmentation, implement model checkpointing, and generate a confusion matrix for performance evaluation.
