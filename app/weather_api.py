@@ -50,12 +50,16 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) 
     url = f"https://api.meteomatics.com/{start_dt}--{end_dt}:P1D/precip_24h:mm/{lat},{lon}/json"
 
     # Perform API request with basic authentication
+    # The API requires authentication using a username and password.
+    # The username and password are passed in the request using the auth parameter.
     response = requests.get(url, auth=(METEO_USER, METEO_PASS))
     if response.status_code != 200:
         raise Exception(f"Meteomatics API error: {response.status_code} {response.text}")
 
     data = response.json()
     # Parse JSON to extract the list of daily precipitation values
+
+    # The response structure is nested, so we need to navigate through the JSON to find the relevant data.
     try:
         dates_data = data["data"][0]["coordinates"][0]["dates"]
         rain_values = [entry.get("value", 0) for entry in dates_data]
