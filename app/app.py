@@ -2,22 +2,35 @@
 # This is the main application file for Plantelligence, a plant care assistant.
 # It allows users to add plants, view their garden, and get weekly watering schedules based on weather data.
 # The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification and weather data.
+# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# https://openai.com
 
 # --- References & Credits ---
-# Plant Image Classification Model:
-# Adapted from the official [TensorFlow Image Classification Tutorial](https://www.tensorflow.org/tutorials/images/classification).
+# Streamlit for building interactive web apps
+# https://streamlit.io
+# PyPI: https://pypi.org/project/streamlit/
 
-# Weather Data :
-# Provided by [Meteomatics Weather API](https://www.meteomatics.com/en/).
-# Geolocation powered by [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api).
+# pandas for data analysis and manipulation
+# https://pandas.pydata.org
+# PyPI: https://pypi.org/project/pandas/
 
-# Scheduling & Checklist UI:
-# Custom implementation for Plantelligence using [Streamlit](https://streamlit.io/).
-        
-# Altair Charting:
-# Rainfall bar charts generated using [Altair](https://altair-viz.github.io/).
-    
-# Icons and Emojis inspired by [Emojipedia](https://emojipedia.org/) and modern UX design patterns.
+# datetime - built-in Python module for handling dates and times
+# https://docs.python.org/3/library/datetime.html
+
+# io - built-in Python module for handling streams (used here for in-memory file handling)
+# https://docs.python.org/3/library/io.html
+
+# Pillow (PIL) - Python Imaging Library for image processing
+# https://python-pillow.org
+# PyPI: https://pypi.org/project/Pillow/
+
+# Altair - declarative statistical visualization library for Python
+# https://altair-viz.github.io
+# PyPI: https://pypi.org/project/altair/
+
+# base64 - built-in Python module for base64 encoding/decoding
+# https://docs.python.org/3/library/base64.html
+
 
 # --- Import necessary libraries ---
 import streamlit as st
@@ -30,8 +43,8 @@ import altair as alt
 import base64
 
 # --- Import custom modules ---
-# the modules represent the different functionalities of the app
-# such as plant classification, weather data retrieval, and scheduling
+# The modules represent the different functionalities of the app
+# Such as plant classification, weather data retrieval, and scheduling
 from plant_api import classify_plant_image
 from weather_api import get_weekly_rainfall, geocode
 from calendar_api import get_watering_schedule

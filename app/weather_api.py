@@ -10,7 +10,7 @@
 # https://datetime.readthedocs.io/en/stable/
 # The code in weather_api.py was developed with reference to public API documentation for Open-Meteo and Meteomatics. 
 # The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
-# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# This script uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
 # https://openai.com
 
 # Import necessary libraries

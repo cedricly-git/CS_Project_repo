@@ -9,7 +9,7 @@
 # https://www.keras.io/examples/vision/image_classification_from_scratch/
 # The code in "plant_api.py" was written with reference to official TensorFlow and Keras documentation.
 # Some elements, such as image preprocessing and model loading, were adapted from common examples and tutorials for deploying deep learning models.
-# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# This script uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
 # https://openai.com
 
 # Import necessary libraries
