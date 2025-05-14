@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import io
 from PIL import Image
-
+ 
 # --- Load the trained model once at import time ---
 # This path is relative to your project root when you run:
 #    streamlit run app/app.py
