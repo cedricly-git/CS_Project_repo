@@ -3,6 +3,22 @@
 # It allows users to add plants, view their garden, and get weekly watering schedules based on weather data.
 # The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification and weather data.
 
+# --- References & Credits ---
+# Plant Image Classification Model:
+# Adapted from the official [TensorFlow Image Classification Tutorial](https://www.tensorflow.org/tutorials/images/classification).
+
+# Weather Data :
+# Provided by [Meteomatics Weather API](https://www.meteomatics.com/en/).
+# Geolocation powered by [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api).
+
+# Scheduling & Checklist UI:
+# Custom implementation for Plantelligence using [Streamlit](https://streamlit.io/).
+        
+# Altair Charting:
+# Rainfall bar charts generated using [Altair](https://altair-viz.github.io/).
+    
+# Icons and Emojis inspired by [Emojipedia](https://emojipedia.org/) and modern UX design patterns.
+
 # --- Import necessary libraries ---
 import streamlit as st
 import datetime
@@ -288,18 +304,3 @@ st.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# --- References & Credits ---
-# Plant Image Classification Model:
-# Adapted from the official [TensorFlow Image Classification Tutorial](https://www.tensorflow.org/tutorials/images/classification).
-
-# Weather Data :
-# Provided by [Meteomatics Weather API](https://www.meteomatics.com/en/).
-# Geolocation powered by [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api).
-
-# Scheduling & Checklist UI:
-# Custom implementation for Plantelligence using [Streamlit](https://streamlit.io/).
-        
-# Altair Charting:
-# Rainfall bar charts generated using [Altair](https://altair-viz.github.io/).
-    
-# Icons and Emojis inspired by [Emojipedia](https://emojipedia.org/) and modern UX design patterns.

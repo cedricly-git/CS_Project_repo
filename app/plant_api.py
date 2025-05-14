@@ -2,6 +2,7 @@
 # This script is the the feature of the plant classification web app.
 # It load a pre-trained Keras model and provides a function to classify plant images.
 # And returns the class label of the plant image.
+# We use the output of this feature to return the class label of the plant image to the "app.py" for the watering recommendation.
 
 # --- Reference ---
 # https://www.tensorflow.org/tutorials/images/classification
