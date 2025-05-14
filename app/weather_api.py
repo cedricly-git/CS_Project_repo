@@ -1,8 +1,13 @@
+# Weather Feature Extraction
+# This module provides functions to fetch and process weather data from the Meteomatics API.
+# It includes functions to geocode city names to latitude and longitude,
 # app/weather_api.py
 
+#Import necessary libraries
 import requests
 import datetime
 
+# Constants for Meteomatics API authentication
 METEO_USER = "universityofstgallen_yan_grace"   
 METEO_PASS = "2XPaF66p7o"
 
@@ -49,3 +54,8 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) 
         raise Exception("Unexpected response format from Meteomatics API") from e
 
     return daily_rain
+
+#Reference:
+# https://api.meteomatics.com/doc/api/1.0/overview/
+#The code in weather_api.py was developed by the author with reference to public API documentation for Open-Meteo and Meteomatics. 
+#The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
