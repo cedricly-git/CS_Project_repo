@@ -259,10 +259,12 @@ if st.session_state.garden:
         cols[2].write(f"{row['Rain (mm)']} mm")
         cols[3].write(row["Watering Advice"])
 
+        # Personal checklist
+        # This section creates a personal checklist for each day of the week in the 4th column.
         checked = cols[4].checkbox(
             label="",
-            value=st.session_state.checklist_states.get(week_key, [False]*7)[idx],
-            key=f"personal_check_{week_key}_{idx}"
+            value=st.session_state.checklist_states.get(week_key, [False]*7)[idx],# Checks if the current week is in the checklist_states dictionary and gets the value for the current day.
+            key=f"personal_check_{week_key}_{idx}" # Creates a unique key for each checkbox based on the week and day index.
         )
         # Update checklist state on user interaction
         if week_key not in st.session_state.checklist_states: # Checks if the checklist_states dictionary does not yet contain an entry for the current
