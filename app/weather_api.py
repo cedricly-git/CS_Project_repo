@@ -7,8 +7,11 @@
 # --- Reference ---
 # https://api.meteomatics.com/doc/api/1.0/overview/
 # https://requests.readthedocs.io/en/latest/user/authentication/
-# The code in weather_api.py was developed by the author with reference to public API documentation for Open-Meteo and Meteomatics. 
+# https://datetime.readthedocs.io/en/stable/
+# The code in weather_api.py was developed with reference to public API documentation for Open-Meteo and Meteomatics. 
 # The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
+# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# https://openai.com
 
 # Import necessary libraries
 # Requests is used for making HTTP requests to the Meteomatics API.

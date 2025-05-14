@@ -6,8 +6,10 @@
 # --- Reference ---
 # https://www.tensorflow.org/tutorials/images/classification
 # https://www.keras.io/examples/vision/image_classification_from_scratch/
-# The code in "plant_api.py" was written by the author with reference to official TensorFlow and Keras documentation.
+# The code in "plant_api.py" was written with reference to official TensorFlow and Keras documentation.
 # Some elements, such as image preprocessing and model loading, were adapted from common examples and tutorials for deploying deep learning models.
+# This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
+# https://openai.com
 
 # Import necessary libraries
 # os is used to locate the model file.
@@ -45,6 +47,8 @@ def classify_plant_image(image_bytes: bytes) -> str:
     one of the five class labels.
     """
     # 1) open from raw bytes
+    # buf declared here is a BytesIO object that allows us to read the raw bytes of the uploaded image.
+    # img is a PIL Image object that represents the image.
     buf = BytesIO(image_bytes)
     img = Image.open(buf)
 
@@ -52,12 +56,17 @@ def classify_plant_image(image_bytes: bytes) -> str:
     img = img.convert("RGB").resize((224, 224))
 
     # 3) to numpy array, float32, leave in [0–255]
+    # arr is a numpy array that represents the image data.
     arr = np.array(img).astype("float32")
 
     # 4) batch dimension
+    # batch is a numpy array with an additional dimension to represent the batch size.
     batch = np.expand_dims(arr, axis=0)
 
     # 5) predict
+    # preds is a numpy array of predicted probabilities for each class.
+    # idx is the index of the class with the highest predicted probability.
+    # the returned class label is the corresponding class name from _CLASS_NAMES.
     preds = _model.predict(batch)
     idx = int(np.argmax(preds[0]))
     return _CLASS_NAMES[idx]
