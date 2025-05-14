@@ -1,5 +1,9 @@
-# app.py
+# --- app.py ---
+# This is the main application file for Plantelligence, a plant care assistant.
+# It allows users to add plants, view their garden, and get weekly watering schedules based on weather data.
+# The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification and weather data.
 
+# --- Import necessary libraries ---
 import streamlit as st
 import datetime
 import pandas as pd
@@ -9,14 +13,19 @@ from PIL import Image
 import altair as alt
 import base64
 
+# --- Import custom modules ---
+# the modules represent the different functionalities of the app
+# such as plant classification, weather data retrieval, and scheduling
 from plant_api import classify_plant_image
 from weather_api import get_weekly_rainfall, geocode
 from calendar_api import get_watering_schedule
 
 # --- Page config ---
+# This sets the title and layout of the Streamlit app.
 st.set_page_config(page_title="Plantelligence 🌱", layout="centered")
 
 # --- Session State Init ---
+# This initializes the session state variables to store user inputs and app data.
 if 'garden' not in st.session_state:
     st.session_state.garden = []
 if "plant_counters" not in st.session_state:
@@ -29,6 +38,7 @@ if "checklist_states" not in st.session_state:
     st.session_state.checklist_states = {}
 
 # --- App Title ---
+# This sets the title of the app and allows the user to name their garden.
 st.title("Welcome to Plantelligence 🌱")
 garden_name = st.text_input("Name your garden:", key="garden_name")
 # allow the user to choose a city for the forecast
@@ -38,12 +48,15 @@ with st.sidebar:
 lat, lon = geocode(city)
 
 # --- Add Plant Form ---
+# This section allows the user to add a new plant to their garden.
 st.subheader("🪴 Add a Plant to Your Garden")
 with st.form("add_plant_form", clear_on_submit=True):
     plant_name = st.text_input("Plant Name", key="plant_name_input")
     plant_file = st.file_uploader("Upload Plant Image", type=["jpg", "jpeg", "png"], key="plant_file_input")
     submitted = st.form_submit_button("Add Plant")
 
+ # --- Plant Classification ---
+# This section classifies the uploaded plant image and adds it to the garden.
 if submitted:
     if not plant_name or not plant_file:
         st.warning("Please provide both a plant name and an image.")
@@ -61,6 +74,8 @@ if submitted:
         st.success(f"Added **{plant_type}** “{plant_name}” to your garden.")
 
 # --- Garden Overview ---
+# This section displays the user's garden overview, including the plants added and their types.
+# It also shows the weekly rainfall forecast and the watering schedule.
 if st.session_state.garden:
     st.markdown("<hr style='margin-top:50px; margin-bottom:20px;'>", unsafe_allow_html=True)
     title = f"🔍 Garden Overview: {garden_name}" if garden_name else "🔍 Garden Overview"
@@ -104,6 +119,7 @@ if st.session_state.garden:
             """, unsafe_allow_html=True)
 
     # --- Weekly Rainfall Forecast Section ---
+    # This section displays the weekly rainfall forecast and the watering schedule.
     st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
     st.subheader("Weekly Rainfall Forecast 🌧️")
 
@@ -120,6 +136,7 @@ if st.session_state.garden:
     week_start = st.session_state.week_start
     
     # Week label
+    # This section displays the week label based on the selected week start date.
     wk_start = st.session_state.week_start
     wk_end   = wk_start + datetime.timedelta(days=6)
     st.markdown(
@@ -129,11 +146,14 @@ if st.session_state.garden:
         f"</div>",
         unsafe_allow_html=True,)
 
-    # 1) make sure we have a persistent counters list
+# --- Weekly Watering Schedule ---
+# This section calculates and displays the weekly watering schedule based on the rainfall forecast.
+    # 1) make sure we have a persistent counters list in session state
     if "plant_counters" not in st.session_state:
         st.session_state.plant_counters = [0] * len(st.session_state.garden)
 
     # 2) fetch rainfall
+    # This section fetches the weekly rainfall data from the weather API.
     try:
         weekly_rain = get_weekly_rainfall(st.session_state.week_start, lat, lon)
     except Exception as e:
@@ -141,6 +161,8 @@ if st.session_state.garden:
         weekly_rain = [0.0] * 7
 
     # 3) Check if watering schedule needs to be recalculated
+    # This section checks if the watering schedule needs to be recalculated based on the week start date.
+    # If the week start date has changed, recalculate the schedule.
     week_key = str(st.session_state.week_start)
     if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key:
         schedule_df, new_counters = get_watering_schedule(
@@ -154,6 +176,7 @@ if st.session_state.garden:
         st.session_state.watering_schedule_key = week_key
 
     # 4) Chart
+    # This section creates a bar chart to visualize the weekly rainfall data.
     days_order = st.session_state.watering_schedule["Day"].tolist()
     chart = (
         alt.Chart(st.session_state.watering_schedule)
@@ -168,6 +191,9 @@ if st.session_state.garden:
     st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
 
     # --- Weekly Watering Schedule Table ---
+    # This section displays the weekly watering schedule in a table format.
+    # The table includes the day, date, rainfall amount, watering advice, and a personal checklist.
+    # The variables are displaed in columns
     st.subheader("📅 Weekly Watering Schedule")
     header_cols = st.columns([2, 2, 2, 3, 2])
     header_cols[0].write("**Day**")
@@ -176,8 +202,10 @@ if st.session_state.garden:
     header_cols[3].write("**Watering Advice**")
     header_cols[4].write("**Personal Checklist**")
 
+    # Add line after the header
     st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True)
 
+    #   This section iterates through the watering schedule DataFrame and displays each row in a column format.
     for idx, row in st.session_state.watering_schedule.iterrows():
         cols = st.columns([2, 2, 2, 3, 2])
         cols[0].write(row["Day"])
