@@ -1,8 +1,13 @@
+# Calendar Feature
+# This module provides a function to compute a watering schedule for a garden based on weekly rainfall.
+# It takes into account the type of plants, their watering needs, and the amount of rain received.
 from datetime import timedelta
 import pandas as pd
 
 SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm considered sufficient rain to water the plants
 
+# Function to compute watering schedule
+# This function computes a 7-day watering schedule for a list of plants given weekly rainfall.
 def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plant_counters: list) -> pd.DataFrame:
     """
     Compute a 7-day watering schedule for a list of plants given weekly rainfall.
@@ -40,10 +45,12 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     advice = []
     updated_counters = plant_counters[:]  # Create a copy of the counters to update
     
+    # Iterate over each day of the week
     for day_idx in range(7):
         day_rain = rain_vals[day_idx]
         needs = []
         
+        # Check each plant's watering needs
         for i, plant in enumerate(garden):
             got_heavy = (day_rain >= SIGNIFICANT_RAIN_THRESHOLD)
             
@@ -54,7 +61,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
                 updated_counters[i] += 1  # Increment the day counter for this plant
             
             plant_type = plant['type']
-            _, max_dry = plant_needs_watering(plant_type, day_rain)
+            _, max_dry = plant_needs_watering(plant_type, day_rain) # Get watering advice
             
             # Check if the plant needs watering based on the max dry period
             if updated_counters[i] > max_dry:
@@ -66,6 +73,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
             advice.append("No water needed")
 
     # Build DataFrame
+    # Create a DataFrame with the computed watering schedule
     df = pd.DataFrame({
         "Day": day_names,
         "Date": date_strs,
@@ -73,3 +81,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
         "Watering Advice": advice
     })
     return df, updated_counters
+
+#Refrence:
+#This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
+# Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
