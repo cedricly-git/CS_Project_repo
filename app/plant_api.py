@@ -47,7 +47,7 @@ def classify_plant_image(image_bytes: bytes) -> str:
     idx = int(np.argmax(preds[0]))
     return _CLASS_NAMES[idx]
 
-# --- Reference: ---
+# --- Reference ---
 #https://www.tensorflow.org/tutorials/images/classification
 #https://www.keras.io/examples/vision/image_classification_from_scratch/
 #The code in "plant_api.py" was written by the author with reference to official TensorFlow and Keras documentation.
