@@ -48,5 +48,7 @@ def classify_plant_image(image_bytes: bytes) -> str:
     return _CLASS_NAMES[idx]
 
 #Reference:
+#https://www.tensorflow.org/tutorials/images/classification
+#https://www.keras.io/examples/vision/image_classification_from_scratch/
 #The code in "plant_api.py" was written by the author with reference to official TensorFlow and Keras documentation.
 # Some elements, such as image preprocessing and model loading, were adapted from common examples and tutorials for deploying deep learning models.
