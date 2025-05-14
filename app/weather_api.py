@@ -23,6 +23,7 @@ METEO_PASS = "2XPaF66p7o"
 
 # Function to geocode city names to latitude and longitude
 # This function uses the Open-Meteo geocoding API to convert a city name into its corresponding latitude and longitude.
+# And returns a tuple of (latitude, longitude).
 def geocode(city: str) -> tuple[float, float]:
     """Use Open-Meteo’s geocoding to turn a city name into (lat, lon)."""
     resp = requests.get(
@@ -37,6 +38,8 @@ def geocode(city: str) -> tuple[float, float]:
     best = results[0]
     return float(best["latitude"]), float(best["longitude"])
 
+# Use the latitude and longitude to get the weekly rainfall data
+# This function fetches daily rainfall data for a week starting from a given date.
 def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) -> list:
     """Fetch daily rainfall (in mm) for 7 days starting from week_start_date (inclusive) at the given location.
     Returns a list of 7 rainfall values (mm) for each day."""
