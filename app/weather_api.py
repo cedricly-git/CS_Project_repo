@@ -1,17 +1,28 @@
 # --- Weather Feature Extraction ---
 # This module provides functions to fetch and process weather data from the Meteomatics API.
-# It includes functions to geocode city names to latitude and longitude,
-# app/weather_api.py
+# It includes functions to geocode city names to latitude and longitude, and to retrieve weekly rainfall data for a given location.
+# We use the output of this feature in "app.py" to have access to the weather data for the selected city.
+# The data is used for watering recommendations.
 
-#Import necessary libraries
+# --- Reference ---
+# https://api.meteomatics.com/doc/api/1.0/overview/
+# https://requests.readthedocs.io/en/latest/user/authentication/
+# The code in weather_api.py was developed by the author with reference to public API documentation for Open-Meteo and Meteomatics. 
+# The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
+
+# Import necessary libraries
+# Requests is used for making HTTP requests to the Meteomatics API.
+# Datetime is used for handling date and time operations.
 import requests
 import datetime
 
 # Constants for Meteomatics API authentication
+# Set the username and password for the Meteomatics API
 METEO_USER = "universityofstgallen_yan_grace"   
 METEO_PASS = "2XPaF66p7o"
 
-# 0) a tiny free geocoder (no API key) for “city → lat, lon”
+# Function to geocode city names to latitude and longitude
+# This function uses the Open-Meteo geocoding API to convert a city name into its corresponding latitude and longitude.
 def geocode(city: str) -> tuple[float, float]:
     """Use Open-Meteo’s geocoding to turn a city name into (lat, lon)."""
     resp = requests.get(
@@ -54,8 +65,3 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) 
         raise Exception("Unexpected response format from Meteomatics API") from e
 
     return daily_rain
-
-# --- Reference ---
-# https://api.meteomatics.com/doc/api/1.0/overview/
-# The code in weather_api.py was developed by the author with reference to public API documentation for Open-Meteo and Meteomatics. 
-# The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
