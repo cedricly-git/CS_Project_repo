@@ -62,8 +62,8 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) 
     if response.status_code != 200:
         raise Exception(f"Meteomatics API error: {response.status_code} {response.text}")
 
-    data = response.json()
     # Parse JSON to extract the list of daily precipitation values
+    data = response.json()
 
     # The response structure is nested, so we need to navigate through the JSON to find the relevant data.
     try:
