@@ -68,4 +68,5 @@ def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) 
     except (KeyError, IndexError) as e:
         raise Exception("Unexpected response format from Meteomatics API") from e
 
+    # return the list of daily rainfall values
     return daily_rain
