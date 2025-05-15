@@ -295,9 +295,11 @@ else:
     st.info("📷 Please add at least one plant to your garden above.") # tell the user to add a plant if none are added
 
 
-# --- Statistics Widget ---
+# --- Overlay Widget ---
 # This section adds a floating widget to display the garden statistics.
 # The widget displays the total number of plants, weeks tracked, current week, and tasks completed this week.
+# We use CSS documentation and ChatGPT assistance to create this floating widget
+
 # This block calculates the statistics for the floating widget.
 total_plants = len(st.session_state.garden)
 total_weeks = len(st.session_state.get("checklist_states", {}))
@@ -306,8 +308,7 @@ completed_tasks = sum(
     st.session_state.checklist_states.get(str(st.session_state.week_start), [])
 ) if "checklist_states" in st.session_state else 0
 
-# We use CSS documentation and ChatGPT to create this floating widget
-# put widget on the right with a margin with the rest so it moves the rest on the left
+# This section creates the floating widget with the garden statistics.
 st.markdown("""
     <style>
     .block-container {
@@ -315,7 +316,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
-# design of the widget and content
+
 st.markdown(f"""
     <style>
     .floating-widget {{
@@ -343,7 +344,7 @@ st.markdown(f"""
         font-size: 15px;
     }}
     </style>
-    
+
     <div class="floating-widget">
         <h4>📊 {garden_name if garden_name else "Garden Overview"}'s Statistics</h4>
         <p>Total Plants: {total_plants}</p>
