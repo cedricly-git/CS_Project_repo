@@ -102,3 +102,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
 # https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html
 # This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
 # Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
+# https://docs.python.org/3/library/
+# Python sources were used for the creation of the if functions. 
+
+
