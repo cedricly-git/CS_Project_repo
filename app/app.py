@@ -125,7 +125,9 @@ if submitted:
             "type": plant_type,
             "image_bytes": image_bytes
         })
+        # starting of dry day counter for new plant; counter tracks how many days have passed without precipitation, whereby starting point is 0 days. 
         st.session_state.plant_counters.append(0)
+        # clear the previously stored watering schedule as the garden respectively the plants have changed (cache must is cleared).
         if 'cached_schedules' in st.session_state:
             st.session_state.cached_schedules = {}
 
@@ -212,30 +214,38 @@ if st.session_state.garden:
     try:
         weekly_rain = get_weekly_rainfall(st.session_state.week_start, lat, lon)
     except Exception as e:
+        # if fetching the precipitation forecast fails, an error message and indication of no rain is shown to the user.
         st.error(f"Error fetching weather data: {e}")
         weekly_rain = [0.0] * 7
 
     # Calculate watering schedule
     # This section checks if the watering schedule needs to be recalculated based on the week start date.
     # If the week start date has changed, recalculate the schedule.
+
+    # conversion of the week start date into a string to use for caching.
     week_key = str(st.session_state.week_start)
 
+    # checks whether the session state has a cache for the watering schedules. If such is not the case, an empty dictionary to store the cached schedules is initialised. 
     if 'cached_schedules' not in st.session_state:
         st.session_state.cached_schedules = {}
-
+        
+    # checking of if a schedule has already been calculated and stores for the present week. If such is the case, the schedule and the corresponding plant counters are retrieved from the cache. 
     if week_key in st.session_state.cached_schedules:
         schedule_df, counters = st.session_state.cached_schedules[week_key]
+
+    # If this is not the case, a new watering schedule is calculated. Attempt to reuse any previously stored counters; if not then default to 0. 
     else:
         # Start counters for the week; use zeros if no previous data
         counters = st.session_state.cached_schedules.get(week_key, (None, [0] * len(st.session_state.garden)))[1]
 
+        # calling of the scheduling function to determine which of the plants need watering for each of the week days. 
         schedule_df, counters = get_watering_schedule(
-            st.session_state.garden,
-            weekly_rain,
-            st.session_state.week_start,
-            counters  # Pass week-specific counters!
+            st.session_state.garden, # present list of plants in garden
+            weekly_rain, # precipitation forecase for week
+            st.session_state.week_start, # start date of the present week
+            counters  # Pass week-specific counters! # counter of dry days to maintain the indiviudal watering need of the respective plants
         )
-        # Cache both schedule and counters for this week
+        # storing of the newly computed schedule and counters in the cache for this week
         st.session_state.cached_schedules[week_key] = (schedule_df, counters)
 
     # Store final schedule and counters for use in this session
