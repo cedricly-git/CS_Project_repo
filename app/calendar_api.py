@@ -78,8 +78,8 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
         else:
             advice.append("No water needed") # none of the plants require watering that day
 
-    # Build DataFrame to display watering scedule in form of table
-    # Create a DataFrame with the computed watering schedule
+    # building of DataFrame to display watering scedule in form of table
+    # creation of a DataFrame with the computed watering schedule
     df = pd.DataFrame({
         "Day": day_names,
         "Date": date_strs,
