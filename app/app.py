@@ -126,8 +126,8 @@ if submitted:
             "image_bytes": image_bytes
         })
         st.session_state.plant_counters.append(0)
-        st.image(display_img, caption=f"{plant_type}: {plant_name}")
-        st.success(f"Added **{plant_type}** “{plant_name}” to your garden.")
+        if 'cached_schedules' in st.session_state:
+            st.session_state.cached_schedules = {}
 
 # --- Garden Overview ---
 # This section displays the user's garden overview, including the plants added and their types.
@@ -218,19 +218,29 @@ if st.session_state.garden:
     # Calculate watering schedule
     # This section checks if the watering schedule needs to be recalculated based on the week start date.
     # If the week start date has changed, recalculate the schedule.
-    week_key = str(st.session_state.week_start) # convert the current week's start date to string for use as a key
-    # check if the schedule is already calculated or if week start has changed but schedule has to be updated
-    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key: 
-        schedule_df, new_counters = get_watering_schedule(
+    week_key = str(st.session_state.week_start)
+
+    if 'cached_schedules' not in st.session_state:
+        st.session_state.cached_schedules = {}
+
+    if week_key in st.session_state.cached_schedules:
+        schedule_df, counters = st.session_state.cached_schedules[week_key]
+    else:
+        # Start counters for the week; use zeros if no previous data
+        counters = st.session_state.cached_schedules.get(week_key, (None, [0] * len(st.session_state.garden)))[1]
+
+        schedule_df, counters = get_watering_schedule(
             st.session_state.garden,
             weekly_rain,
             st.session_state.week_start,
-            st.session_state.plant_counters
+            counters  # Pass week-specific counters!
         )
-        # Store the new schedule and counters in session state
-        st.session_state.watering_schedule = schedule_df
-        st.session_state.plant_counters = new_counters
-        st.session_state.watering_schedule_key = week_key
+        # Cache both schedule and counters for this week
+        st.session_state.cached_schedules[week_key] = (schedule_df, counters)
+
+    # Store final schedule and counters for use in this session
+    st.session_state.watering_schedule = schedule_df
+    st.session_state.plant_counters = counters
 
     # Chart
     # use the package altair to create a bar chart
@@ -256,7 +266,7 @@ if st.session_state.garden:
     # The table includes the day, date, rainfall amount, watering advice, and a personal checklist.
     # Title
     st.subheader("📅 Weekly Watering Schedule")
-    # The variables are displaed in columns for column 0 we have the day, column 1 the date, column 2 the rain amount, column 3 the watering advice and column 4 a personal checklist
+    # The variables are displayed in columns for column 0 we have the day, column 1 the date, column 2 the rain amount, column 3 the watering advice and column 4 a personal checklist
     header_cols = st.columns([2, 2, 2, 3, 2])
     header_cols[0].write("**Day**")
     header_cols[1].write("**Date**")
