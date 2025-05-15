@@ -7,6 +7,7 @@
 # --- Reference ---
 # https://api.meteomatics.com/doc/api/1.0/overview/
 # https://requests.readthedocs.io/en/latest/user/authentication/
+# https://docs.python-requests.org/en/latest/
 # https://datetime.readthedocs.io/en/stable/
 # The code in weather_api.py was developed with reference to public API documentation for Open-Meteo and Meteomatics. 
 # The structure for making HTTP requests and parsing JSON responses follows standard usage examples provided by these services.
@@ -24,7 +25,7 @@ import datetime
 METEO_USER = "universityofstgallen_yan_grace"   
 METEO_PASS = "2XPaF66p7o"
 
-# Function to geocode city names to latitude and longitude
+# We define a function that geocode city names to latitude and longitude
 # This function uses the Open-Meteo geocoding API to convert a city name into its corresponding latitude and longitude.
 # And returns a tuple of (latitude, longitude).
 def geocode(city: str) -> tuple[float, float]:
@@ -42,17 +43,14 @@ def geocode(city: str) -> tuple[float, float]:
     return float(best["latitude"]), float(best["longitude"])
 
 # Use the latitude and longitude to get the weekly rainfall data
+# We define a new function called "get_weekly_rainfall"
 # This function fetches daily rainfall data for a week starting from a given date.
 def get_weekly_rainfall(week_start_date: datetime.date, lat: float, lon: float) -> list:
     """Fetch daily rainfall (in mm) for 7 days starting from week_start_date (inclusive) at the given location.
     Returns a list of 7 rainfall values (mm) for each day."""
-    # Construct the Meteomatics API URL for daily precipitation (24h accumulated) 
-    # from week_start_date to week_start_date+7 days (which gives 7 values, one per day).
-    # Format dates to ISO 8601 with UTC time (00:00Z for daily accumulated precipitation).
     start_dt = datetime.datetime.combine(week_start_date, datetime.time.min).strftime("%Y-%m-%dT%H:%M:%SZ")
     end_date = week_start_date + datetime.timedelta(days=7)  # 7 days later (exclusive end)
     end_dt = datetime.datetime.combine(end_date, datetime.time.min).strftime("%Y-%m-%dT%H:%M:%SZ")
-    # Parameter for daily precipitation is "precip_24h:mm"
     url = f"https://api.meteomatics.com/{start_dt}--{end_dt}:P1D/precip_24h:mm/{lat},{lon}/json"
 
     # Perform API request with basic authentication
