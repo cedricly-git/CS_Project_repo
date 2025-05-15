@@ -9,7 +9,7 @@ import pandas as pd # for the creation of the table (DataFrame output)
 # This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
 # Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
 # https://docs.python.org/3/library/
-# Used to understand and correctly apply Python's standard library modules, especially: datetime.timedelta and enumerate().
+# Used to understand and correctly apply Python's standard library modules, especially datetime.timedelta and enumerate().
 
 # meteo swiss defines from on 10 mm of precipitation within 24 h as heavy precipitation, thus we have choosen 10 mm as a threshold as well
 # https://www.meteoswiss.admin.ch/weather/weather-and-climate-from-a-to-z/precipitation.html
@@ -26,6 +26,7 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     - plant_counters: list tracking days since last significant rain for each plant.
     Returns a DataFrame with columns Day, Date, Rain (mm), Watering Advice, and updated plant_counters.
     """
+    # source: ChatGPT assisted in the creation of the function concept and implementation. 
     # Build base calendar
     # generates a list of dates objects for each day of the week starting from the starting date
     dates = [(week_start_date + timedelta(days=i)) for i in range(7)]
@@ -64,7 +65,8 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     # list to track and store days since last significant rain per plant and watering advice
     advice = []
     updated_counters = plant_counters[:]  # Create a copy of the counters to update
-    
+
+    # source: ChatGPT assisted in the creation of the function concept and implementation. 
     # iterate for each day of the week (day 0 to day 6)
     for day_idx in range(7):
         day_rain = rain_vals[day_idx] # gets amount of precipitation of current day
