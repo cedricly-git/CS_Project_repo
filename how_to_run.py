@@ -1,6 +1,6 @@
 # TUTORIAL ON HOW TO RUN THE APP AND TRAIN THE MODEL
 
-# how to run the app:
+# --- how to run the app: ---
 
 #step 1
 # open terminal on your computer
@@ -27,7 +27,7 @@
 # download plant images and have fun with the app!
 
 
-# how to train the model 
+# --- how to train the model ---
 # We have sent you the project with the model trained, however, if you want to train the model and try the app again with the new model, please follow these steps
 
 #step 1
