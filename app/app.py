@@ -207,7 +207,8 @@ if st.session_state.garden:
         f"{wk_end.strftime('%B')} {wk_end.day}, {wk_end.year}"
         f"</div>",
         unsafe_allow_html=True,)
-
+    
+    # source: ChatGPT assisted in the creation of the function and section concept and implementation. 
     # This section calculates and displays the weekly rainfall forecast chart based on the rainfall forecast.
     # fetch rainfall
     # This section fetches the weekly rainfall data with get_weekly_rainfall (function defined in weather_api.py)
