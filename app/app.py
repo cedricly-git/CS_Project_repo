@@ -133,15 +133,13 @@ if submitted:
 # This section displays the user's garden overview, including the plants added and their types.
 # We used CSS documentation and chat GPT for this section
 if st.session_state.garden:
-    # space for appearance
-    st.markdown("<hr style='margin-top:50px; margin-bottom:20px;'>", unsafe_allow_html=True)
-    #Title (of section AND name of the garden entered at the beginning)
-    title = f"🔍 Garden Overview 🔍: {garden_name}" if garden_name else "🔍 Garden Overview"
+    st.markdown("<hr style='margin-top:50px; margin-bottom:20px;'>", unsafe_allow_html=True) # space for appearance
+    title = f"🔍 Garden Overview 🔍: {garden_name}" if garden_name else "🔍 Garden Overview"#Title (of section AND name of the garden entered at the beginning)
     st.subheader(title)
-    # define how the types will be displayed
-    type_icons = {"Tree": "🌳", "Flower": "🌸", "Grass": "🌱", "Edible": "🥕", "Succulent": "🌵"}
+
+    type_icons = {"Tree": "🌳", "Flower": "🌸", "Grass": "🌱", "Edible": "🥕", "Succulent": "🌵"} # define how the types will be displayed
     # format of the plants in the garden overview -> card view
-    st.markdown("""
+    st.markdown(""" 
         <style>
         .plant-card {
             border: 1px solid #ddd;
@@ -158,8 +156,8 @@ if st.session_state.garden:
         }
         </style>
     """, unsafe_allow_html=True)
-    # display plants in 3 columns with image, name, type in card forma
-    num_cols = 3
+
+    num_cols = 3 # display plants in 3 columns with image, name, type in card forma
     cols = st.columns(num_cols)
     for idx, plant in enumerate(st.session_state.garden):
         with cols[idx % num_cols]:
