@@ -1,7 +1,7 @@
 # --- app.py ---
 # This is the main application file for Plantelligence, a plant care assistant.
-# It allows users to add plants, view their garden, and get weekly watering schedules based on weather data.
-# The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification and weather data.
+# It allows users to add plants, view their garden, and get weekly watering schedules based on weather data and their location.
+# The app uses Streamlit for the frontend, Altair for visualizations, and integrates with various APIs for plant classification, calendar visualisaiton, and weather data.
 
 
 # --- References & Credits ---
@@ -30,6 +30,9 @@
 # base64 - built-in Python module for base64 encoding/decoding
 # https://docs.python.org/3/library/base64.html
 
+# Real Pyhton tutorials: https://realpython.com
+# W3Schools Python tutorial: https://www.w3schools.com/python/ 
+
 # This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
 # https://openai.com
 
@@ -38,7 +41,7 @@
 # ├── plant_api.py          # Plant classification API
 # ├── weather_api.py        # Weather data API
 # ├── calendar_api.py       # Calendar and scheduling API
-# ├── model (folder)        # the code for training model & the .keras file, the train model
+# ├── model (folder)        # the code for training model & the .keras file, the trained model
 # ├── requirements.txt      # Python package dependencies
 
 # --- Import necessary libraries ---
@@ -81,10 +84,12 @@ if "checklist_states" not in st.session_state:
     st.session_state.checklist_states = {}
 
 # --- App Title ---
-# This sets the title of the app and allows the user to name their garden.
+# This sets the title of the app and allows the user to input the name of their garden.
+# Title
 st.title("Welcome to Plantelligence 🌱")
 garden_name = st.text_input("Name your garden:", key="garden_name")
-# allow the user to choose a city for the forecast
+# allow the user to choose a city for the forecast in the sidebar
+# defines the variables lat and lon based the city named (retrieve the geocode used later from the weather API directly)
 with st.sidebar:
     st.header("Weather Settings 🌍")
     city = st.text_input("In which city is your garden?:", value="St. Gallen")
@@ -92,14 +97,19 @@ lat, lon = geocode(city)
 
 # --- Add Plant Form ---
 # This section allows the user to add a new plant to their garden.
+# Title
 st.subheader("🪴 Add a Plant to Your Garden")
+# This block allow the user to name their plant, upload an image of it and submit so it gets analysed and displayed in the garden
 with st.form("add_plant_form", clear_on_submit=True):
     plant_name = st.text_input("Plant Name", key="plant_name_input")
     plant_file = st.file_uploader("Upload Plant Image", type=["jpg", "jpeg", "png"], key="plant_file_input")
     submitted = st.form_submit_button("Add Plant")
 
  # --- Plant Classification ---
-# This section classifies the uploaded plant image and adds it to the garden.
+# This section classifies the uploaded plant image.
+# Uses classify_plant_image from plant_api to determine the plant's type.
+# First, the name or the image hasn't been uploaded, they get asked
+# Otherwise, the image read, the type is determined, the plant is added to the garden with name, type and image, the plant counter increases, the plant is displayed with name, type and image, and finally the success message.
 if submitted:
     if not plant_name or not plant_file:
         st.warning("Please provide both a plant name and an image.")
@@ -118,14 +128,15 @@ if submitted:
 
 # --- Garden Overview ---
 # This section displays the user's garden overview, including the plants added and their types.
-# It also shows the weekly rainfall forecast and the watering schedule.
 if st.session_state.garden:
+    # space for appearance
     st.markdown("<hr style='margin-top:50px; margin-bottom:20px;'>", unsafe_allow_html=True)
-    title = f"🔍 Garden Overview: {garden_name}" if garden_name else "🔍 Garden Overview"
+    #Title (of section AND name of the garden entered at the beginning)
+    title = f"🔍 Garden Overview 🔍: {garden_name}" if garden_name else "🔍 Garden Overview"
     st.subheader(title)
-
+    # define how the types will be displayed
     type_icons = {"Tree": "🌳", "Flower": "🌸", "Grass": "🌱", "Edible": "🥕", "Succulent": "🌵"}
-
+    # format of the plants in the garden overview -> card view
     st.markdown("""
         <style>
         .plant-card {
@@ -143,7 +154,7 @@ if st.session_state.garden:
         }
         </style>
     """, unsafe_allow_html=True)
-
+    # display plants in 3 columns with image, name, type in card forma
     num_cols = 3
     cols = st.columns(num_cols)
     for idx, plant in enumerate(st.session_state.garden):
@@ -162,10 +173,12 @@ if st.session_state.garden:
             """, unsafe_allow_html=True)
 
     # --- Weekly Rainfall Forecast Section ---
-    # This section displays the weekly rainfall forecast and the watering schedule.
+    # This section displays the weekly rainfall forecast.
+    # space for appearance
     st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
+    # Title
     st.subheader("Weekly Rainfall Forecast 🌧️")
-
+    # This blocks display the "Previous Week" and "Next Week" buttons. These change the date of the week start when clicked.
     col1, col2 = st.columns([1, 3])
 
     with col1:
@@ -180,8 +193,10 @@ if st.session_state.garden:
     
     # Week label
     # This section displays the week label based on the selected week start date.
+    #define week start and end to be displayed
     wk_start = st.session_state.week_start
     wk_end   = wk_start + datetime.timedelta(days=6)
+    # diplay week label with week start, end and year in the center
     st.markdown(
         f"<div style='text-align:center; font-weight:bold;'>"
         f"Week of {wk_start.strftime('%B')} {wk_start.day} – "
@@ -189,26 +204,21 @@ if st.session_state.garden:
         f"</div>",
         unsafe_allow_html=True,)
 
-# --- Weekly Watering Schedule ---
-# This section calculates and displays the weekly watering schedule based on the rainfall forecast.
-    # 1) make sure we have a persistent counters list in session state
-    if "plant_counters" not in st.session_state:
-        st.session_state.plant_counters = [0] * len(st.session_state.garden)
-
-    # 2) fetch rainfall
-    # This section fetches the weekly rainfall data from the weather API.
+    # This section calculates and displays the weekly rainfall forecast chart based on the rainfall forecast.
+    # fetch rainfall
+    # This section fetches the weekly rainfall data with get_weekly_rainfall (function defined in weather_api.py)
     try:
         weekly_rain = get_weekly_rainfall(st.session_state.week_start, lat, lon)
     except Exception as e:
         st.error(f"Error fetching weather data: {e}")
         weekly_rain = [0.0] * 7
 
-    # 3) Check if watering schedule needs to be recalculated
+    # 3) Calculate watering schedule
     # This section checks if the watering schedule needs to be recalculated based on the week start date.
     # If the week start date has changed, recalculate the schedule.
     week_key = str(st.session_state.week_start) # convert the current week's start date to string for use as a key
-    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key: # check if the schedule is already calculated
-        # If not, calculate the watering schedule
+    # check if the schedule is already calculated or if week start has changed but schedule has to be updated
+    if 'watering_schedule' not in st.session_state or st.session_state.watering_schedule_key != week_key: 
         schedule_df, new_counters = get_watering_schedule(
             st.session_state.garden,
             weekly_rain,
@@ -219,12 +229,13 @@ if st.session_state.garden:
         st.session_state.watering_schedule = schedule_df
         st.session_state.plant_counters = new_counters
         st.session_state.watering_schedule_key = week_key
-    # Store everything in session state
 
     # 4) Chart
     # use the package altair to create a bar chart
     # This section creates a bar chart to visualize the weekly rainfall data.
+    # Get the order of days from the DataFrame
     days_order = st.session_state.watering_schedule["Day"].tolist() # Get the order of days from the DataFrame
+    # Create chart data from watering_schedule, with the days on the x axis and mm of rain on the y axis
     chart = (
         alt.Chart(st.session_state.watering_schedule)
           .mark_bar()
@@ -232,24 +243,26 @@ if st.session_state.garden:
               x=alt.X("Day", sort=days_order, title="Day"),
               y=alt.Y("Rain (mm)", title="Rain (mm)"),
           )
-    ) # Create a bar chart with days on the x-axis and rainfall on the y-axis
+    ) 
+    # Display the chart
     st.altair_chart(chart, use_container_width=True) # Display the chart with altair
-
-    st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True) # Add space between chart and table
-
+    
+    # space for appearance
+    st.markdown("<div style='margin-top: 50px;'></div>", unsafe_allow_html=True)
     # --- Weekly Watering Schedule Table ---
     # This section displays the weekly watering schedule in a table format.
     # The table includes the day, date, rainfall amount, watering advice, and a personal checklist.
-    # The variables are displaed in columns for column 0 we have the day, column 1 the date, column 2 the rain amount, column 3 the watering advice and column 4 a personal checklist
+    # Title
     st.subheader("📅 Weekly Watering Schedule")
+    # The variables are displaed in columns for column 0 we have the day, column 1 the date, column 2 the rain amount, column 3 the watering advice and column 4 a personal checklist
     header_cols = st.columns([2, 2, 2, 3, 2])
     header_cols[0].write("**Day**")
     header_cols[1].write("**Date**")
     header_cols[2].write("**Rain (mm)**")
     header_cols[3].write("**Watering Advice**")
     header_cols[4].write("**Personal Checklist**")
-
-    st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True) # Add line after header
+    # Add line after header
+    st.markdown("<hr style='border: 1px solid #ddd; margin: 5px 0;'>", unsafe_allow_html=True) 
 
     #   This section iterates through the watering schedule DataFrame and displays each row in a column format.
     for idx, row in st.session_state.watering_schedule.iterrows(): 
@@ -278,10 +291,9 @@ else:
     st.info("📷 Please add at least one plant to your garden above.") # tell the user to add a plant if none are added
 
 
-# --- Overlay Widget ---
+# --- Statistics Widget ---
 # This section adds a floating widget to display the garden statistics.
-
-# This section adds CSS to style the floating widget.
+# This section adds CSS to style the floating widget. We used CSS documentation 
 st.markdown("""
     <style>
     .block-container {
@@ -300,6 +312,7 @@ completed_tasks = sum(
 
 # This section creates the floating widget with the garden statistics.
 # The widget displays the total number of plants, weeks tracked, current week, and tasks completed this week.
+# We use CSS documentation and ChatGPT to create this floating widget
 st.markdown(f"""
     <style>
     .floating-widget {{
