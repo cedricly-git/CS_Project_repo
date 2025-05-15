@@ -9,7 +9,7 @@ import pandas as pd # for the creation of the table (DataFrame output)
 # This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
 # Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
 # https://docs.python.org/3/library/
-# Python sources were used for the creation of the if functions. 
+# Used to understand and correctly apply Python's standard library modules, especially: datetime.timedelta and enumerate().
 
 # meteo swiss defines from on 10 mm of precipitation within 24 h as heavy precipitation, thus we have choosen 10 mm as a threshold as well
 # https://www.meteoswiss.admin.ch/weather/weather-and-climate-from-a-to-z/precipitation.html
