@@ -4,6 +4,8 @@
 from datetime import timedelta # to calculate future dates
 import pandas as pd # for the creation of the table (DataFrame output)
 
+# meteo swiss defines from on 10 mm of precipitation within 24 h as heavy precipitation, thus we have choosen 10 mm as a threshold as well
+# https://www.meteoswiss.admin.ch/weather/weather-and-climate-from-a-to-z/precipitation.html
 SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm above this value (i.e. 10mm) is considered sufficient to be sufficient to water the plants
 
 # Function to compute watering schedule
@@ -28,6 +30,13 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     rain_vals = [float(r) for r in weekly_rain]
 
     # Prepare advice per plant per day; determines which, if any, of the plants need watering
+    # sources for the choosed maximum number of drr days, i.e. days without precipitation each plant can go: 
+    # amount of days recommended is based on maximum number and including a margin of safety (i.e. the recommended days are shorter than the maximum amount the plant could techincally survive)
+    # https://harddy.com/blogs/succulents-cacti-faq/how-long-can-succulents-survive-without-water#:~:text=Outdoor%20Hot%20Climates,to%20sustain%20them%20year%2Dround.
+    # https://extension.missouri.edu/publications/g6722#:~:text=Most%20grasses%20will%20survive%204%20to%206,as%20soon%20as%20possible%20after%20water%20recedes.
+    # https://foodgardening.mequoda.com/daily/watering-irrigation/how-often-should-i-water-my-plants-in-the-summer/#:~:text=Most%20plants%20will%20grow%20deeper,or%20three%20days%20this%20way.
+    # https://tuigarden.co.nz/inspiration-hub/ideas-and-inspiration/water-saving-guide/
+    # https://woodlandswater.org/nurturing-mature-trees-through-drought-a-guide-to-proper-watering/#:~:text=Deep%2C%20Infrequent%20Watering:%20Just%20like,a%20longer%20period%20of%20time.
     def plant_needs_watering(plant_type, recent_rain):
         # Determine max dry days by type before the respective plant needs watering
         if plant_type == "Succulent":
