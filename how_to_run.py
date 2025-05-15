@@ -41,6 +41,7 @@
 # create a new environment with conda
 # type in your terminal: conda create -n plantelligence python=3.9
 # press enter
+
 # and install the libraries from requirements.txt
 # type in your terminal: conda activate plantelligence
 # press enter
