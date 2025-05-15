@@ -7,6 +7,7 @@
 # --- Reference ---
 # https://www.tensorflow.org/tutorials/images/classification
 # https://www.keras.io/examples/vision/image_classification_from_scratch/
+# https://docs.python.org/3/library/os.path.html
 # The code in "plant_api.py" was written with reference to official TensorFlow and Keras documentation.
 # Some elements, such as image preprocessing and model loading, were adapted from common examples and tutorials for deploying deep learning models.
 # This script uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
@@ -28,6 +29,7 @@ from PIL import Image
 # — Step 1: locate & load the .keras model —
 # The model was trained using TensorFlow 2.12.0 and Keras 2.12.0.
 # The model file is located in the "model" directory
+# https://docs.python.org/3/library/os.path.html
 script_dir = os.path.dirname(os.path.abspath(__file__))
 model_dir = os.path.join(script_dir, os.pardir, "model")
 model_path = os.path.join(model_dir, "plant_classifier.keras")
