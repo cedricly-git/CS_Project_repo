@@ -4,6 +4,13 @@
 from datetime import timedelta # to calculate future dates
 import pandas as pd # for the creation of the table (DataFrame output)
 
+# --- Reference ---
+# https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html
+# This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
+# Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
+# https://docs.python.org/3/library/
+# Python sources were used for the creation of the if functions. 
+
 # meteo swiss defines from on 10 mm of precipitation within 24 h as heavy precipitation, thus we have choosen 10 mm as a threshold as well
 # https://www.meteoswiss.admin.ch/weather/weather-and-climate-from-a-to-z/precipitation.html
 SIGNIFICANT_RAIN_THRESHOLD = 10.0  # mm above this value (i.e. 10mm) is considered sufficient to be sufficient to water the plants
@@ -98,11 +105,6 @@ def get_watering_schedule(garden: list, weekly_rain: list, week_start_date, plan
     # return both the schedule DataFrame and the updated counters to use during the next cycle
     return df, updated_counters
 
-# --- Reference ---
-# https://pandas.pydata.org/pandas-docs/stable/user_guide/10min.html
-# This code was written by the author with reference to online examples and documentation, including Python and pandas resources. 
-# Some logic patterns were adapted from community discussions (e.g., Stack Overflow) for educational purposes.
-# https://docs.python.org/3/library/
-# Python sources were used for the creation of the if functions. 
+
 
 
