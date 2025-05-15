@@ -38,9 +38,18 @@
 # copy step 1 and 2 from before to get in the right folder of your terminal
 
 #step 3
+# create a new environment with conda
+# type in your terminal: conda create -n plantelligence python=3.9
+# press enter
+# and install the libraries from requirements.txt
+# type in your terminal: conda activate plantelligence
+# press enter
+# type in your terminal: pip install -r requirements.txt
+
+#step 4
 # type in your terminal: python model/predict.py
 # press enter
 # wait for the model to be trained and automatically saved in the 'model' subfolder (takes a few minutes depending on the processing power of your computer)
 
-#step 4
+#step 5
 # do steps 1 to 5 again from 'how to run the app' to try the app again with the model you just trained
