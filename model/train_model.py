@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 # Step 1: Define paths and parameters
 # Define the path to the dataset and model directory
-script_dir = os.path.dirname(os.path.abspath(__file__))
+script_dir = os.path.dirname(os.path.abspath("train_model.py"))
 data_dir = os.path.join(script_dir, os.pardir, "plant_images")
 model_dir = os.path.join(script_dir, os.pardir, "model")
 os.makedirs(model_dir, exist_ok=True)
