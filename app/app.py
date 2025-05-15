@@ -127,7 +127,7 @@ if submitted:
         })
         # starting of dry day counter for new plant; counter tracks how many days have passed without precipitation, whereby starting point is 0 days. 
         st.session_state.plant_counters.append(0)
-        # clear the previously stored watering schedule as the garden respectively the plants have changed (cache must is cleared).
+        # clear watering schedule as the garden respectively the plants have changed (cache must is cleared).
         if 'cached_schedules' in st.session_state:
             st.session_state.cached_schedules = {}
 
