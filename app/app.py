@@ -33,6 +33,9 @@
 # Real Pyhton tutorials: https://realpython.com
 # W3Schools Python tutorial: https://www.w3schools.com/python/ 
 
+# CSS documentation - styling cards and widget
+# CSS reference: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference
+
 # This project uses or was assisted by OpenAI's language models (ChatGPT/GPT-4)
 # https://openai.com
 
@@ -128,6 +131,7 @@ if submitted:
 
 # --- Garden Overview ---
 # This section displays the user's garden overview, including the plants added and their types.
+# We used CSS documentation and chat GPT for this section
 if st.session_state.garden:
     # space for appearance
     st.markdown("<hr style='margin-top:50px; margin-bottom:20px;'>", unsafe_allow_html=True)
@@ -213,7 +217,7 @@ if st.session_state.garden:
         st.error(f"Error fetching weather data: {e}")
         weekly_rain = [0.0] * 7
 
-    # 3) Calculate watering schedule
+    # Calculate watering schedule
     # This section checks if the watering schedule needs to be recalculated based on the week start date.
     # If the week start date has changed, recalculate the schedule.
     week_key = str(st.session_state.week_start) # convert the current week's start date to string for use as a key
@@ -230,7 +234,7 @@ if st.session_state.garden:
         st.session_state.plant_counters = new_counters
         st.session_state.watering_schedule_key = week_key
 
-    # 4) Chart
+    # Chart
     # use the package altair to create a bar chart
     # This section creates a bar chart to visualize the weekly rainfall data.
     # Get the order of days from the DataFrame
@@ -293,16 +297,8 @@ else:
 
 # --- Statistics Widget ---
 # This section adds a floating widget to display the garden statistics.
-# This section adds CSS to style the floating widget. We used CSS documentation 
-st.markdown("""
-    <style>
-    .block-container {
-        margin-right: 350px;  /* Moves the content left but keeps full width */
-    }
-    </style>
-""", unsafe_allow_html=True)
-
-# This section calculates the statistics for the floating widget.
+# The widget displays the total number of plants, weeks tracked, current week, and tasks completed this week.
+# This block calculates the statistics for the floating widget.
 total_plants = len(st.session_state.garden)
 total_weeks = len(st.session_state.get("checklist_states", {}))
 current_week = st.session_state.week_start.strftime("%B %d, %Y")
@@ -310,9 +306,16 @@ completed_tasks = sum(
     st.session_state.checklist_states.get(str(st.session_state.week_start), [])
 ) if "checklist_states" in st.session_state else 0
 
-# This section creates the floating widget with the garden statistics.
-# The widget displays the total number of plants, weeks tracked, current week, and tasks completed this week.
 # We use CSS documentation and ChatGPT to create this floating widget
+# put widget on the right with a margin with the rest so it moves the rest on the left
+st.markdown("""
+    <style>
+    .block-container {
+        margin-right: 350px;  /* Moves the content left but keeps full width */
+    }
+    </style>
+""", unsafe_allow_html=True)
+# design of the widget and content
 st.markdown(f"""
     <style>
     .floating-widget {{
@@ -340,7 +343,7 @@ st.markdown(f"""
         font-size: 15px;
     }}
     </style>
-
+    
     <div class="floating-widget">
         <h4>📊 {garden_name if garden_name else "Garden Overview"}'s Statistics</h4>
         <p>Total Plants: {total_plants}</p>
