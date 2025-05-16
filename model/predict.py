@@ -20,7 +20,12 @@ import matplotlib.pyplot as plt
 # https://www.tensorflow.org/tutorials/images/classification (Accessed: May 3, 2025)
 # Function concept and implementation assisted by ChatGPT (Accessed: May 3 2024)
 
-data_dir = "/Users/graceyan/CS_Project_repo/plant_images" #Here, we specfify where the plant images are, i.e. the path to the image subfolders 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+model_dir = os.path.join(script_dir, os.pardir, "model")
+model_path = os.path.join(model_dir, "plant_classifier.keras")
+data_dir = os.path.join(script_dir, os.pardir, "plant_images") #Here, we specfify where the plant images are, i.e. the path to the image subfolders 
+
+
 img_size = (224, 224) #we are specifyign the size of the images to 224x224 pixels, which all images will be resized to 
 batch_size = 8 #this is the number of images processed at once
 #source: 
@@ -118,7 +123,7 @@ model.compile( #here we specifiy 3 components that are important for the trainin
 #setting up some callbacks:
 callbacks = [
     EarlyStopping(patience=10, restore_best_weights=True), #it stops training early if the model's performance stops improving for 10 epochs
-    ModelCheckpoint(filepath="/Users/graceyan/CS_Project_repo/model/plant_classifier.keras", save_best_only=True), #locally saving the trained model, filepath might have to be adjusted
+    ModelCheckpoint(filepath=model_path, save_best_only=True), #locally saving the trained model, filepath might have to be adjusted
     ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-6, verbose=1) #reduces the learning rate by half when the model stops improving. It is based on the validation loss.
 ]
 #source: 
@@ -129,7 +134,7 @@ callbacks = [
 history = model.fit(
     train_ds, #this is the training set that the model is trained with, containing 1) images and 2) labels (true plant types)
     validation_data=val_ds, #this is the validation/test dataset
-    epochs=50, #looping through the training set 50 times 
+    epochs=1, #looping through the training set 50 times 
     callbacks=callbacks
 )
 #source: 
@@ -151,3 +156,4 @@ plt.show() #displays the plot
 # https://www.tensorflow.org/tutorials/images/classification (Accessed: May 4, 2025)
 # Function concept and implementation assisted by ChatGPT (Accessed: May 4 2024)
 
+print(model_path)
