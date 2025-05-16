@@ -20,8 +20,8 @@ import matplotlib.pyplot as plt
 # https://www.tensorflow.org/tutorials/images/classification (Accessed: May 3, 2025)
 # Function concept and implementation assisted by ChatGPT (Accessed: May 3 2024)
 
-
-script_dir = os.path.dirname(os.path.abspath(__file__)) #relative path: locates the file running, returns the directory of the absolute path
+# turns the relative path of this file into absolute path to find the folders used and tell where to store plant_classifier.keras (the trained model)
+script_dir = os.path.dirname(os.path.abspath(__file__)) #locates the file running, returns the directory of the absolute path
 model_dir = os.path.join(script_dir, os.pardir, "model") #from the absolute path we find the parent directory and go in model
 model_path = os.path.join(model_dir, "plant_classifier.keras") #from the absolute path of model we add plant_classifier.keras
 data_dir = os.path.join(script_dir, os.pardir, "plant_images") #from the absolute path of this file we find the parent directory and in it find plant_images
